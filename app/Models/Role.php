@@ -16,7 +16,6 @@ class Role extends Model
         'name',
         'access_permission',
         'is_active',
-        'created_at'
     ];
 
     protected $hidden = [

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\Auth\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,14 +17,19 @@ use App\Http\Controllers\Api\UserController;
 |
 */
 
-//Role Controller
-Route::resource("role", RoleController::class);
-Route::put('role-archived/{id}',[RoleController::class,'archived']);
+Route::post('login',[AuthController::class,'login']);
 
-//Users Controller
-Route::resource("users", UserController::class);
-Route::put('user-archived/{id}',[UserController::class,'archived']);
+Route::group(["middleware" => ["auth:sanctum"]], function () {
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+    //Auth Controller
+    Route::post('logout',[AuthController::class,'logout']);
+
+    //Role Controller
+    Route::resource("role", RoleController::class);
+    Route::put('role-archived/{id}',[RoleController::class,'archived']);
+
+    //Users Controller
+    Route::resource("users", UserController::class);
+    Route::put('user-archived/{id}',[UserController::class,'archived']);
+
 });

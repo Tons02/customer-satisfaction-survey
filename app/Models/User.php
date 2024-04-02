@@ -30,9 +30,9 @@ class User extends Authenticatable
         'gender',
         'age',
         'username',
+        'password',
         'role_id',
-        'is_active',
-        'created_at'
+        'is_active'
     ];
 
     /**
