@@ -28,11 +28,10 @@ class RoleRequest extends FormRequest
                 $this->route()->role
                     ? "unique:roles,name," . $this->route()->role
                     : "unique:roles,name",
-                "min:1"
             ],
             "access_permission" => [
+                "required",
                 "array", 
-                "min:1",
             ],
             "access_permission.*" => [
                 "distinct"

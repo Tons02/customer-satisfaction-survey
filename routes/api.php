@@ -4,7 +4,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\AnswerController;
+use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\QuestionnaireController;
+use App\Http\Controllers\Api\QuestionClassificationController;
 
 /*
 |--------------------------------------------------------------------------
