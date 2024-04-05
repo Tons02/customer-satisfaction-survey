@@ -63,16 +63,21 @@ class UserController extends Controller
         $userID = User::with("role")->find($id);
 
         if (!$userID) {
-            return response()->json([
-                'status_code' => "404",
-                'message' => "User not found"
-                ], 404);
+            return GlobalFunction::response_function(Message::NOT_FOUND, $users);
         }
 
         $userID->update([
+            "first_name" => $request["first_name"],
+            "middle_name" => $request["middle_name"],
+            "last_name" => $request["last_name"],
+            "suffix" => $request["suffix"],
+            "mobile_number" => $request["mobile_number"],
+            "gender" => $request["gender"],
+            "age" => $request["age"],
+
             "username" => $request["username"],
+
             "role_id" => $request["role_id"],
-            "form_template_id" => $request["form_template_id"]
         ]);
        
         return GlobalFunction::response_function(Message::USER_UPDATE, $userID);

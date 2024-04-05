@@ -33,7 +33,8 @@ class UserRequest extends FormRequest
                 "string",            
                 "regex:/^\+63\d+$/",
                 "min:13",
-                "max:13"
+                "max:13",
+                "unique:users,mobile_number," . $this->route()->user,
             ],
             "gender" => [
                 "required",

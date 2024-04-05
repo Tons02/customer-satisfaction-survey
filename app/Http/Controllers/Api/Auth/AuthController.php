@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Models\User;
+use Ichtrojan\Otp\Otp;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -39,4 +40,5 @@ class AuthController extends Controller
         auth('sanctum')->user()->currentAccessToken()->delete();//logout currentAccessToken
         return response()->json(['message' => 'You are Successfully Logged Out!']);
     }
+
 }
