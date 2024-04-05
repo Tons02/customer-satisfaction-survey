@@ -58,10 +58,14 @@ class RoleController extends Controller
             return GlobalFunction::not_found(Message::NOT_FOUND);
         }
 
-        $role_id->update([
-            "name" => $request->name,
-            "access_permission" => $request->access_permission,
-        ]);
+        $role_id->name = $request['name'];
+        $role_id->access_permission = $request['access_permission'];
+
+        if (!$role_id->isDirty()) {
+            return GlobalFunction::response_function(Message::NO_CHANGES);
+        }
+
+        $role_id->save();
         
         return GlobalFunction::response_function(Message::ROLE_UPDATE, $role_id);
     }

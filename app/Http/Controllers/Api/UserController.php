@@ -66,10 +66,14 @@ class UserController extends Controller
             return GlobalFunction::response_function(Message::NOT_FOUND, $users);
         }
 
-        $userID->update([
-             "username" => $request["username"],
-                "role_id" => $request["role_id"],
-        ]);
+        $userID->username = $request['username'];
+        $userID->role_id = $request['role_id'];
+
+        if (!$userID->isDirty()) {
+            return GlobalFunction::response_function(Message::NO_CHANGES);
+        }
+
+        $userID->save();
        
         return GlobalFunction::response_function(Message::USER_UPDATE, $userID);
     }

@@ -48,6 +48,7 @@ class Message
     
 
     //GLOBAL MESSAGE
+    const NO_CHANGES = "No Changes";
     const INVALID_STATUS = "Invalid Status";
     const INVALID_ID = "Invalid ID";
     const NOT_FOUND = "No Data Found";
