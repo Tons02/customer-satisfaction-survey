@@ -22,17 +22,20 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'id_prefix', 
+        'id_no',
         'first_name',
-        'middle_name',
+        'middle_name', 
         'last_name',
-        'suffix',
-        'mobile_number',
-        'gender',
-        'age',
-        'username',
+        'contact_details',
+        'sex',
+        'username', 
         'password',
+        'location_id',
+        'department_id', 
+        'company_id',
         'role_id',
-        'is_active'
+        'is_active',
     ];
 
     /**
@@ -63,4 +66,5 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class, 'role_id')->withTrashed();
     }
+
 }

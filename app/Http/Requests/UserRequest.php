@@ -22,38 +22,20 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "first_name" => [
-                "required"
-            ], 
-            "last_name" => [
-                "required"
+            "personal_info.id_prefix" => "sometimes:required|min:1|regex:/[^\s]/",
+            "personal_info.id_no" => [
+                "sometimes:required",
+                "unique:users,id_no",
             ],
-            "mobile_number" => [
-                "required",
-                "string",            
-                "regex:/^\+63\d+$/",
-                "min:13",
-                "max:13",
-                "unique:users,mobile_number," . $this->route()->user,
-            ],
-            "gender" => [
-                "required",
-                "in:male,female"
-            ],
-            "age" => [
-                "required",
-                "numeric",
-            ],
-
-            "username" => 
-             [
+            "personal_info.first_name" => "sometimes:required", 
+            "personal_info.last_name" => "sometimes:required",
+            "personal_info.sex" => "sometimes:required",
+            "username" => [
                 "required",
                 "unique:users,username," . $this->route()->user,
             ],
-            "role_id" => [
-                "required",
-                "exists:roles,id"
-            ]
+
+            "role_id" => ["required","exists:roles,id"]
         ];
     }
 

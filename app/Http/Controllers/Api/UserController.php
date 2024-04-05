@@ -36,16 +36,16 @@ class UserController extends Controller
             return GlobalFunction::response_function(Message::USER_DISPLAY, $users);
     }
 
-    public function store(Request $request){
+    public function store(UserRequest $request){
 
         $create_user = User::create([
-            "first_name" => $request["first_name"],
-            "middle_name" => $request["middle_name"],
-            "last_name" => $request["last_name"],
-            "suffix" => $request["suffix"],
-            "mobile_number" => $request["mobile_number"],
-            "gender" => $request["gender"],
-            "age" => $request["age"],
+            "id_prefix" => $request["personal_info"]["id_prefix"],
+            "id_no" => $request["personal_info"]["id_no"],
+            "first_name" => $request["personal_info"]["first_name"],
+            "middle_name" => $request["personal_info"]["middle_name"],
+            "last_name" => $request["personal_info"]["last_name"],
+            "contact_details" => $request["personal_info"]["contact_details"],
+            "sex" => $request["personal_info"]["sex"],
 
             "username" => $request["username"],
             "password" => $request["username"],
@@ -67,17 +67,8 @@ class UserController extends Controller
         }
 
         $userID->update([
-            "first_name" => $request["first_name"],
-            "middle_name" => $request["middle_name"],
-            "last_name" => $request["last_name"],
-            "suffix" => $request["suffix"],
-            "mobile_number" => $request["mobile_number"],
-            "gender" => $request["gender"],
-            "age" => $request["age"],
-
-            "username" => $request["username"],
-
-            "role_id" => $request["role_id"],
+             "username" => $request["username"],
+                "role_id" => $request["role_id"],
         ]);
        
         return GlobalFunction::response_function(Message::USER_UPDATE, $userID);

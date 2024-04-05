@@ -7,14 +7,19 @@ use Essa\APIToolKit\Filters\QueryFilters;
 class UserFilters extends QueryFilters
 {
     protected array $allowedFilters = [
-        "id",
+        "id_prefix",
+        "id_no",
         "first_name",
         "middle_name",
         "last_name",
-        "suffix",
-        "gender",
-        "age",
+        "contact_details",
+        "sex",
         "username",
+        "location_id",
+        "department_id",
+        "form_template",
+        "company_id",
+        "created_at", 
     ];
     
     protected array $allowedSorts = [
