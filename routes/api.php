@@ -28,6 +28,8 @@ Route::post('login',[AuthController::class,'login']);
 Route::group(["middleware" => ["auth:sanctum"]], function () {
 
     //Auth Controller
+    Route::patch('changepassword',[AuthController::class,'changedPassword']);
+    Route::patch('resetpassword/{id}',[AuthController::class,'resetPassword']);
     Route::post('logout',[AuthController::class,'logout']);
 
     //Role Controller
