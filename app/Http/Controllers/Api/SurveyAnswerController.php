@@ -141,18 +141,4 @@ class SurveyAnswerController extends Controller
         } 
     }
 
-    public function sendverificationcode(Request $request){
-        $otp = new Otp();
-        $otpValue = $otp->generate($request->input('mobile_number'), 'numeric', 6, 10);
-      
-        return GlobalFunction::response_function(Message::SMS_OTP_SAVE, $otpValue);
-    }
-    
-
-    public function validatecode(Request $request){
-        $otp = new Otp();
-        $otpValue = $otp->validate($request->input('mobile_number'), $request->input('code'));
-
-        return GlobalFunction::response_function($otpValue);
-    }
 }

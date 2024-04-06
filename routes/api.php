@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\SmsController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AnswerController;
@@ -46,9 +47,11 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
 
     //Survey Answers Controller
     Route::resource("survey-answer", SurveyAnswerController::class);
-    Route::post('send-verification-code',[SurveyAnswerController::class,'sendverificationcode']);
-    Route::post('validate-code',[SurveyAnswerController::class,'validatecode']);
     Route::put('survey-answer-archived/{id}',[SurveyAnswerController::class,'archived']);
+
+    //SMS Controller
+    Route::post('send-verification-code',[SmsController::class,'sendverificationcode']);
+    Route::post('validate-code',[SmsController::class,'validatecode']);
 
     //Voucher Validity Controller
     Route::resource("voucher-validity", VoucherValidityController::class);
