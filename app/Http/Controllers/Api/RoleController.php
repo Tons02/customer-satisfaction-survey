@@ -31,10 +31,10 @@ class RoleController extends Controller
         $is_empty = $Role->isEmpty();
 
         if ($is_empty) {
-            return GlobalFunction::response_function(Message::NOT_FOUND, $Role);
+            return GlobalFunction::response_function(Message::NOT_FOUND);
         }
             RoleResource::collection($Role);
-            return GlobalFunction::response_function(Message::ROLE_DISPLAY, $Role);
+            return GlobalFunction::response_function(Message::ROLE_DISPLAY);
 
     }
 
@@ -46,7 +46,7 @@ class RoleController extends Controller
             "access_permission" => $request->access_permission,
         ]);
 
-        return GlobalFunction::response_function(Message::ROLE_SAVE, $create_role);
+        return GlobalFunction::response_function(Message::ROLE_SAVE);
         
     }
 
@@ -67,7 +67,7 @@ class RoleController extends Controller
 
         $role_id->save();
         
-        return GlobalFunction::response_function(Message::ROLE_UPDATE, $role_id);
+        return GlobalFunction::response_function(Message::ROLE_UPDATE);
     }
 
     public function archived(Request $request, $id)
@@ -83,11 +83,11 @@ class RoleController extends Controller
                 'is_active' => 1
             ]);
             $role->restore();
-            return GlobalFunction::response_function(Message::RESTORE_STATUS, $role);
+            return GlobalFunction::response_function(Message::RESTORE_STATUS);
         }
 
         if (User::where('role_id', $id)->exists()) {
-            return GlobalFunction::invalid(Message::ROLE_ALREADY_USE, $role);
+            return GlobalFunction::invalid(Message::ROLE_ALREADY_USE);
         }
 
         if (!$role->deleted_at) {
@@ -95,7 +95,7 @@ class RoleController extends Controller
                 'is_active' => 0
             ]);
             $role->delete();
-            return GlobalFunction::response_function(Message::ARCHIVE_STATUS, $role);
+            return GlobalFunction::response_function(Message::ARCHIVE_STATUS);
 
         } 
     }

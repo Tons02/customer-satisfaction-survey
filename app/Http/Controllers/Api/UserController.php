@@ -54,7 +54,7 @@ class UserController extends Controller
 
         ]);
 
-        return GlobalFunction::save(Message::USER_SAVE, $create_user);
+        return GlobalFunction::save(Message::USER_SAVE);
         
     }
 
@@ -75,7 +75,7 @@ class UserController extends Controller
 
         $userID->save();
        
-        return GlobalFunction::response_function(Message::USER_UPDATE, $userID);
+        return GlobalFunction::response_function(Message::USER_UPDATE);
     }
 
     public function archived(Request $request, $id){
