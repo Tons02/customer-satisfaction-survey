@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Models\User;
 use Ichtrojan\Otp\Otp;
+use App\Response\Message;
 use Illuminate\Http\Request;
+use App\Functions\GlobalFunction;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
@@ -21,10 +23,9 @@ class AuthController extends Controller
         $login=User::with('role')->where('username',$username)->get()->first();
 
         if (! $login || ! Hash::check($password, $login->password)) {
-            throw ValidationException::withMessages([
-                'message' => ['The provided credentials are incorrect.']
-            ])->status(404);
+            return GlobalFunction::denied(Message::LOGIN_FAILED);
         }
+
         $token = $login->createToken('myapptoken')->plainTextToken;
         $cookie = cookie('authcookie',$token);
 
@@ -38,44 +39,36 @@ class AuthController extends Controller
     }
 
     public function Logout(Request $request){
-        auth('sanctum')->user()->currentAccessToken()->delete();//logout currentAccessToken
-        return response()->json(['message' => 'You are Successfully Logged Out!']);
+        
+        auth('sanctum')->user()->currentAccessToken()->delete();
+        return GlobalFunction::denied(Message::LOGOUT_USER);
+
     }
 
     public function resetPassword(Request $request, $id){
-       return $user = User::where('id', $id)->first();
+        $user = User::where('id', $id)->first();
 
         if (!$user) {
-            return response()->json([
-                'status_code' => "404",
-                'message' => "User not found"
-                ], 404);
+            return GlobalFunction::response_function(Message::INVALID_ID);
         }
         
         $user->update([
             'password' => $user->username,
         ]);
-        return response()->json(['message' => 'Password has been Reset!'], 200);
+        
+        return GlobalFunction::response_function(Message::RESET_PASSWORD);
     }
 
     public function changedPassword(ChangePasswordRequest $request){
 
         $user = auth('sanctum')->user();
         $username = $user->username;
-    
-        if($username === $request->new_password){
-            return response()->json(['message' => 'The new password must be different from your username.'], 422);
-        }
-
-        if (! $user) {
-            return response()->json(['message' => 'User not authenticated'], 401);
-        }
 
         $user->update([
             'password' => Hash::make($request->new_password),
         ]);
     
-        return response()->json(['message' => 'Password Successfully Changed!!'], 200);
+        return GlobalFunction::response_function(Message::CHANGE_PASSWORD);
     }
 
 }

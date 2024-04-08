@@ -11,9 +11,16 @@ class Message
     const DENIED_STATUS = 403;
     const CUT_OFF_STATUS = 409;
 
+    //AUTH OPERATIONS
+    const LOGIN_USER = "Sucessfully login.";
+    const LOGIN_FAILED = "The provided credentials are incorrect.";
+    const RESET_PASSWORD = "The Password has been reset";
+    const CHANGE_PASSWORD = "Password change successfully";
+    const LOGOUT_USER = "You are successfully logged out.";
+    
+
     //USER OPERATIONS
     const USER_SAVE = "User successfully save.";
-    const LOGIN_USER = "Sucessfully login.";
     const USER_UPDATE = "User successfully updated.";
     const USER_DISPLAY = "User display successfully.";
     
@@ -55,7 +62,6 @@ class Message
     const INVALID_ACTION = "Invalid action.";
     const ARCHIVE_STATUS = "Successfully archived.";
     const RESTORE_STATUS = "Successfully restore.";
-    const LOGOUT_USER = "Logout Successfully";
     
 }
 
