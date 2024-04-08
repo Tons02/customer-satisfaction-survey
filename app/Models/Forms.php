@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use App\Filters\QuestionnaireFilters;
-use Essa\APIToolKit\Filters\Filterable;
+use App\Models\Sections;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\softDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Questionnaire extends Model
+class Forms extends Model
 {
-    use HasFactory, softDeletes, Filterable;
+    use HasFactory, softDeletes;
     protected $fillable = [
-        'questionnaire',
+        'title',
+        'description',
         'is_active',
     ];
 
@@ -21,10 +21,20 @@ class Questionnaire extends Model
         "deleted_at"
     ];
 
-    protected string $default_filters = QuestionnaireFilters::class;
-
     protected $casts = [
-        'questionnaire' => 'json',
         'is_active' => 'boolean'
     ];
+
+    public function sections()
+    {
+        return $this->belongsToMany(Sections::class, 'form_section',
+        "form_id",
+        "section_id",
+        "id",
+        "id"
+    );
+
+
+    }
+    
 }

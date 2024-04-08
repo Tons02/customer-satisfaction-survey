@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('questionnaires', function (Blueprint $table) {
+        Schema::create('question_option', function (Blueprint $table) {
             $table->increments('id');
-            $table->json('questionnaire');
-            $table->boolean('is_active')->default(true);
+            $table->unsignedInteger('question_id');
+            $table->unsignedInteger('option_id');
             $table->timestamps();
-            $table->softDeletes();
+        
+            $table->foreign('question_id')->references('id')->on('questions')->onDelete('cascade');
+            $table->foreign('option_id')->references('id')->on('options')->onDelete('cascade');
         });
     }
 
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('questionnaires');
+        Schema::dropIfExists('question_option');
     }
 };

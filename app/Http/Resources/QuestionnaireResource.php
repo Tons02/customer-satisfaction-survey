@@ -16,7 +16,9 @@ class QuestionnaireResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'questionnaire' => $this->questionnaire,
+            'title' => $this->title,
+            'description' => $this->description,
+            'sections' => $this->sections,
             'is_active' => $this->is_active
         ];
     }
