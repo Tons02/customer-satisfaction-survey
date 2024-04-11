@@ -34,7 +34,7 @@ class RoleController extends Controller
             return GlobalFunction::response_function(Message::NOT_FOUND);
         }
             RoleResource::collection($Role);
-            return GlobalFunction::response_function(Message::ROLE_DISPLAY);
+            return GlobalFunction::response_function(Message::ROLE_DISPLAY,$Role);
 
     }
 

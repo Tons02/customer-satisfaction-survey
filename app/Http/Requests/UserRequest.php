@@ -29,6 +29,9 @@ class UserRequest extends FormRequest
             ],
             "personal_info.first_name" => "sometimes:required", 
             "personal_info.last_name" => "sometimes:required",
+            "personal_info.contact_details" => [
+                "regex:/^\+63\d{11}$/",
+            ],
             "personal_info.sex" => "sometimes:required",
             "username" => [
                 "required",
@@ -38,5 +41,13 @@ class UserRequest extends FormRequest
             "role_id" => ["required","exists:roles,id"]
         ];
     }
+
+    public function messages()
+{
+    return [
+        "personal_info.id_no.unique" => "The employee ID has already been taken",
+        "personal_info.contact_details.regex" => "The mobile number field format is invalid.",
+    ];
+}
 
 }
