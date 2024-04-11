@@ -26,6 +26,11 @@ use App\Http\Controllers\Api\QuestionClassificationController;
 
 Route::post('login',[AuthController::class,'login']);
 
+// SMS Controller
+Route::post('send-verification-code', [SmsController::class, 'sendverificationcode'])->middleware('throttle:5,1'); 
+Route::post('validate-code', [SmsController::class, 'validatecode'])->middleware('throttle:5,1'); 
+
+
 Route::group(["middleware" => ["auth:sanctum"]], function () {
 
     //Auth Controller
@@ -49,13 +54,8 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
     Route::resource("survey-answer", SurveyAnswerController::class);
     Route::put('survey-answer-archived/{id}',[SurveyAnswerController::class,'archived']);
 
-    //SMS Controller
-    Route::post('send-verification-code',[SmsController::class,'sendverificationcode']);
-    Route::post('validate-code',[SmsController::class,'validatecode']);
-
     //Voucher Validity Controller
     Route::resource("voucher-validity", VoucherValidityController::class);
     Route::put('voucher-validity-archived/{id}',[VoucherValidityController::class,'archived']);
-
     
 });
