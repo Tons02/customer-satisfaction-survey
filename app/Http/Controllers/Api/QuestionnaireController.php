@@ -35,7 +35,7 @@ class QuestionnaireController extends Controller
         if ($is_empty) {
             return GlobalFunction::response_function(Message::NOT_FOUND, $Questionnaire);
         }
-           return QuestionnaireResource::collection($Questionnaire);
+            QuestionnaireResource::collection($Questionnaire);
             return GlobalFunction::response_function(Message::QUESTIONNAIRE_DISPLAY, $Questionnaire);
 
     }
@@ -44,7 +44,7 @@ class QuestionnaireController extends Controller
     {   
 
         if (Forms::count()){
-            return GlobalFunction::response_function(Message::INVALID_ACTION,);
+            return GlobalFunction::response_function(Message::INVALID_ACTION);
         }
 
         $questionnaire = Forms::create([
@@ -62,7 +62,7 @@ class QuestionnaireController extends Controller
                 "next_section" => $sectionData['next_section'],
             ]);
 
-            $questionnaire->sections()->attach($section->id);
+            $questionnire->sections()->attach($section->id);
 
             // Loop through questions
             foreach ($sectionData['questions'] as $questionData) {
@@ -92,6 +92,7 @@ class QuestionnaireController extends Controller
         return GlobalFunction::response_function(Message::QUESTIONNAIRE_SAVE, $questionnaire);
         
     }
+
 
 }
 

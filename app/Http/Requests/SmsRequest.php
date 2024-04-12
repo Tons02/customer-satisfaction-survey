@@ -23,7 +23,7 @@ class SmsRequest extends FormRequest
     {
         return [
             "mobile_number" => [
-                "regex:/^\+63\d{11}$/",
+                "regex:/^\+63\d{10}$/",
             ],
             "code" => [
                 "sometimes",
