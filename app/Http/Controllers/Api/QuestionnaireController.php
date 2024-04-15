@@ -42,7 +42,6 @@ class QuestionnaireController extends Controller
 
     public function store(Request $request)
     {   
-
         if (Forms::count()){
             return GlobalFunction::response_function(Message::INVALID_ACTION);
         }
@@ -62,12 +61,12 @@ class QuestionnaireController extends Controller
                 "next_section" => $sectionData['next_section'],
             ]);
 
-            $questionnire->sections()->attach($section->id);
+             $questionnaire->sections()->attach($section->id);
 
             // Loop through questions
             foreach ($sectionData['questions'] as $questionData) {
                 // Create question
-                $question = Questions::create([
+               $question = Questions::create([
                     "question" => $questionData['question'],
                     "description" => $questionData['description'],
                     "type" => $questionData['type'],
@@ -80,7 +79,7 @@ class QuestionnaireController extends Controller
                 // Loop through answers
                 foreach ($questionData['option'] as $optionData) {
                     // Create option
-                    $option = Option::create([
+                      $option = Option::create([
                         "option" => $optionData['option'],
                         "next_section" => $optionData['next_section'], 
                     ]);
@@ -91,6 +90,85 @@ class QuestionnaireController extends Controller
 
         return GlobalFunction::response_function(Message::QUESTIONNAIRE_SAVE, $questionnaire);
         
+    }
+
+    public function update(Request $request, $id)
+    {   
+        $questionnaire = Forms::find($id);
+
+        if (!$questionnaire) {
+            return GlobalFunction::not_found(Message::NOT_FOUND);
+        }
+
+         // Update the existing form
+        $questionnaire->update([
+            "title" => $request->form['title'],
+            "description" => $request->form['description'],
+        ]);
+
+        // Loop through sections
+        foreach ($request->section as $sectionData) {
+            $section = Sections::find($sectionData['id']);
+
+            if (!$section) {
+                return GlobalFunction::not_found(Message::INVALID_ID, $sectionData['id']);
+            }
+            $section = Sections::updateOrCreate(
+                // Find or create section by id
+                ['id' => $sectionData['id']], 
+                [
+                    "section" => $sectionData['section'],
+                    "name" => $sectionData['name'],
+                    "description" => $sectionData['description'],
+                    "next_section" => $sectionData['next_section'],
+                ]
+            );
+
+            $questionnaire->sections()->syncWithoutDetaching($section->id);
+
+            // Loop through questions
+            foreach ($sectionData['questions'] as $questionData) {
+                $question = Questions::find($questionData['id']);
+
+                if (!$question) {
+                    return GlobalFunction::not_found(Message::INVALID_ID, $sectionData['id']);
+                }
+                $question = Questions::updateOrCreate(
+                    // Find or create question by id
+                    ['id' => $questionData['id']],
+                    [
+                        "question" => $questionData['question'],
+                        "description" => $questionData['description'],
+                        "type" => $questionData['type'],
+                        "required" => $questionData['required'],
+                    ]
+            );
+
+            $section->questions()->syncWithoutDetaching($question->id);
+
+            
+            // Loop through answers
+            foreach ($questionData['option'] as $optionData) {
+                $option = Option::find($optionData['id']);
+
+                if (!$option) {
+                    return GlobalFunction::not_found(Message::INVALID_ID, $optionData['id']);
+                }
+                $option = Option::updateOrCreate(
+                    // Find or create option by id
+                    ['id' => $optionData['id']],
+                    [
+                        "option" => $optionData['option'],
+                        "next_section" => $optionData['next_section'],
+                    ]
+                );
+                $question->options()->syncWithoutDetaching($option->id);
+            }
+        }
+
+        }
+       
+        return GlobalFunction::response_function(Message::QUESTIONNAIRE_UPDATE, $questionnaire);
     }
 
 

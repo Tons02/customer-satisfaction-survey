@@ -33,8 +33,6 @@ class Forms extends Model
         "id",
         "id"
     );
-
-
     }
     
 }

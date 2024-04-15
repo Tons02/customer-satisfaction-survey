@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('options', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('option');
+            $table->json('option');
             $table->string('next_section')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();

@@ -29,14 +29,9 @@ class Questions extends Model
         'is_active' => 'boolean'
     ];
     
-    public function sections()
-    {
-        return $this->belongsToMany(Sections::class, 'section_question');
-    }
-
     public function options()
     {
-        return $this->belongsToMany(Questions::class, 'question_option',
+        return $this->belongsToMany(Option::class, 'question_option',
         "question_id",
         "option_id",
         "id",

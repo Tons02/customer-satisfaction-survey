@@ -22,6 +22,7 @@ class Option extends Model
     ];
 
     protected $casts = [
+        'option' => 'json',
         'is_active' => 'boolean'
     ];
 
@@ -33,7 +34,6 @@ class Option extends Model
         "id",
         "id"
     );
-
-
     }
+    
 }
