@@ -24,7 +24,26 @@ class SmsController extends Controller
     
         $response = Http::withToken($token)->post($sms_post, [
                     'system_name' => 'Customer Service Satisfaction',
-                    'message' => 'Fresh Morning here is your OTP:'.$otpsms,
+                    'message' => 'Fresh Morning, here is your OTP: ' . $otpsms . ' to proceed to your survey',
+                    'mobile_number' => $request["mobile_number"]
+        ]);
+
+
+        return GlobalFunction::response_function(Message::SMS_OTP_SAVE);
+    }
+
+    public function sendverificationcoderesetpassword(SmsRequest $request){
+        $otp = new Otp();
+        $otpValue = $otp->generate($request->input('mobile_number'), 'numeric', 6, 10);
+        
+        $otpsms = $otpValue->token;
+
+        $token = env('SMS_TOKEN');
+        $sms_post = env('SMS_POST');
+    
+        $response = Http::withToken($token)->post($sms_post, [
+                    'system_name' => 'Customer Service Satisfaction',
+                    'message' => 'Fresh Morning, here is your OTP: ' . $otpsms . ' to reset your password',
                     'mobile_number' => $request["mobile_number"]
         ]);
 

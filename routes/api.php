@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\QuestionClassificationController;
 Route::post('login',[AuthController::class,'login']);
 
 // SMS Controller
+Route::post('send-verification-code-reset-password', [SmsController::class, 'sendverificationcoderesetpassword'])->middleware('throttle:5,1'); 
 Route::post('send-verification-code', [SmsController::class, 'sendverificationcode'])->middleware('throttle:5,1'); 
 Route::post('validate-code', [SmsController::class, 'validatecode'])->middleware('throttle:5,1'); 
 
