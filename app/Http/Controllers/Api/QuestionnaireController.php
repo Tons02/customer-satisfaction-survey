@@ -108,11 +108,6 @@ class QuestionnaireController extends Controller
 
         // Loop through sections
         foreach ($request->section as $sectionData) {
-            $section = Sections::find($sectionData['id']);
-
-            if (!$section) {
-                return GlobalFunction::not_found(Message::INVALID_ID, $sectionData['id']);
-            }
             $section = Sections::updateOrCreate(
                 // Find or create section by id
                 ['id' => $sectionData['id']], 
@@ -128,11 +123,7 @@ class QuestionnaireController extends Controller
 
             // Loop through questions
             foreach ($sectionData['questions'] as $questionData) {
-                $question = Questions::find($questionData['id']);
-
-                if (!$question) {
-                    return GlobalFunction::not_found(Message::INVALID_ID, $sectionData['id']);
-                }
+        
                 $question = Questions::updateOrCreate(
                     // Find or create question by id
                     ['id' => $questionData['id']],
@@ -149,11 +140,7 @@ class QuestionnaireController extends Controller
             
             // Loop through answers
             foreach ($questionData['option'] as $optionData) {
-                $option = Option::find($optionData['id']);
-
-                if (!$option) {
-                    return GlobalFunction::not_found(Message::INVALID_ID, $optionData['id']);
-                }
+                
                 $option = Option::updateOrCreate(
                     // Find or create option by id
                     ['id' => $optionData['id']],

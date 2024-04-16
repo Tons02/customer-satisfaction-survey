@@ -74,7 +74,7 @@ class SurveyAnswerController extends Controller
             "gender" => $request["gender"],
             "age" => $request["age"],
 
-            "questionnaire_answer" => $request->answers,
+            "questionnaire_answer" => $request->questionnaire_answer,
             "voucher_code" => $vouchercode,
             "valid_until" => $validUntil,
             "next_voucher_date" => Carbon::now()->addDays(90),

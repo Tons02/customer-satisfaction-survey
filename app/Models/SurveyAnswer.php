@@ -20,6 +20,7 @@ class SurveyAnswer extends Model
         'last_name',
         'suffix',
         'mobile_number',
+        'mobile_number_verified',
         'gender',
         'age',
         'questionnaire_answer',
@@ -38,6 +39,7 @@ class SurveyAnswer extends Model
     protected string $default_filters = SurveyAnswerFilter::class;
 
     protected $casts = [
+        'mobile_number_verified' => 'boolean',
         'questionnaire_answer' => 'json',
         'is_active' => 'boolean'
     ];
