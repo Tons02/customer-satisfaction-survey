@@ -7,25 +7,18 @@ use Illuminate\Http\Request;
 use App\Models\VoucherValidity;
 use App\Functions\GlobalFunction;
 use App\Http\Controllers\Controller;
-use Essa\APIToolKit\Api\ApiResponse;
 use App\Http\Requests\VoucherValidityRequest;
 use App\Http\Resources\VoucherValidityResource;
 
 class VoucherValidityController extends Controller
 {
-    use ApiResponse;
     
     public function index(Request $request)
     {   
         $status = $request->query('status');
         
         $VoucherValidity = VoucherValidity::
-        when($status === "inactive", function ($query) {
-            $query->onlyTrashed();
-        })
-        ->orderBy('created_at', 'desc')
-        ->useFilters()
-        ->dynamicPaginate();
+        get();
         
         $is_empty = $VoucherValidity->isEmpty();
 
