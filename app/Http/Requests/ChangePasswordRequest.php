@@ -27,8 +27,17 @@ class ChangePasswordRequest extends FormRequest
                 'required',
                 'min:4',
                 'different:old_password',
+                'not_in:' . auth()->user()->username,
             ],
             'confirm_password' => 'required_with:new_password|same:new_password|min:4',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            "new_password.not_in" => "The new password and username must be different",
+        ];
+    }
+    
 }
