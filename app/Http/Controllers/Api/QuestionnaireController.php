@@ -22,7 +22,7 @@ class QuestionnaireController extends Controller
         $status = $request->query('status');
         
         $Questionnaire = Forms::
-        with('sections.questions.options')
+        with('sections.questions')
         ->when($status === "inactive", function ($query) {
             $query->onlyTrashed();
         })
@@ -71,20 +71,11 @@ class QuestionnaireController extends Controller
                     "description" => $questionData['description'],
                     "type" => $questionData['type'],
                     "required" => $questionData['required'],
+                    "options" => $questionData['options']
                 ]);
                 
-                //here is my has pivot connection question() and is not working in attaching can you help me
                 $section->questions()->attach($question->id);
 
-                // Loop through answers
-                foreach ($questionData['option'] as $optionData) {
-                    // Create option
-                      $option = Option::create([
-                        "option" => $optionData['option'],
-                        "next_section" => $optionData['next_section'], 
-                    ]);
-                    $question->options()->attach($option->id);
-                }
             }
         }
 
@@ -132,25 +123,12 @@ class QuestionnaireController extends Controller
                         "description" => $questionData['description'],
                         "type" => $questionData['type'],
                         "required" => $questionData['required'],
+                        "options" => $questionData['options']
                     ]
             );
 
             $section->questions()->syncWithoutDetaching($question->id);
-
-            
-            // Loop through answers
-            foreach ($questionData['option'] as $optionData) {
-                
-                $option = Option::updateOrCreate(
-                    // Find or create option by id
-                    ['id' => $optionData['id']],
-                    [
-                        "option" => $optionData['option'],
-                        "next_section" => $optionData['next_section'],
-                    ]
-                );
-                $question->options()->syncWithoutDetaching($option->id);
-            }
+           
         }
 
         }

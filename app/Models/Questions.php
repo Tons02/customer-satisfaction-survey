@@ -17,6 +17,7 @@ class Questions extends Model
         'description',
         'type',
         'required',
+        'options',
         'is_active',
     ];
 
@@ -26,16 +27,9 @@ class Questions extends Model
     ];
 
     protected $casts = [
+        'options' => 'json',
+        'required' => 'boolean',
         'is_active' => 'boolean'
     ];
     
-    public function options()
-    {
-        return $this->belongsToMany(Option::class, 'question_option',
-        "question_id",
-        "option_id",
-        "id",
-        "id"
-    );
-}
 }

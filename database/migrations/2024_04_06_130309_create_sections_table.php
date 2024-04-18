@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('sections', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('section');
-            $table->string('name');
+            $table->string('section')->nullable();
+            $table->string('name')->nullable();
             $table->string('description')->nullable();
             $table->string('next_section');
             $table->boolean('is_active')->default(true);
