@@ -12,6 +12,7 @@ class Sections extends Model
 {
     use HasFactory, softDeletes;
     protected $fillable = [
+        'id',
         'section',
         'name',
         'description',
@@ -33,9 +34,13 @@ class Sections extends Model
         "section_id",
         "question_id",
         "id",
-        "id");
+        "id"
+    );
     }
-    
+ 
+    public function getDescriptionAttribute($value){
+        return $value ?? "";
+    }   
     
     
 }

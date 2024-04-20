@@ -13,6 +13,7 @@ class Forms extends Model
     protected $fillable = [
         'title',
         'description',
+        'sections',
         'is_active',
     ];
 
@@ -22,17 +23,13 @@ class Forms extends Model
     ];
 
     protected $casts = [
+        'sections' => 'json',
         'is_active' => 'boolean'
     ];
 
-    public function sections()
-    {
-        return $this->belongsToMany(Sections::class, 'form_section',
-        "form_id",
-        "section_id",
-        "id",
-        "id"
-    );
-    }
     
+    public function getDescriptionAttribute($value){
+        return $value ?? "";
+    }
+
 }

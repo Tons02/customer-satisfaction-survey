@@ -15,6 +15,7 @@ return new class extends Migration
             $table->increments('id');
             $table->string('title')->nullable();
             $table->string('description')->nullable();
+            $table->json('sections')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();

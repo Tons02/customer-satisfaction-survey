@@ -43,11 +43,11 @@ class UserRequest extends FormRequest
     }
 
     public function messages()
-{
-    return [
-        "personal_info.id_no.unique" => "The employee ID has already been taken",
-        "personal_info.contact_details.regex" => "The mobile number field format is invalid.",
-    ];
-}
+    {
+        return [
+            "personal_info.id_no.unique" => "The employee ID has already been taken",
+            "personal_info.contact_details.regex" => "The mobile number field format is invalid.",
+        ];
+    }
 
 }

@@ -31,5 +31,13 @@ class Questions extends Model
         'required' => 'boolean',
         'is_active' => 'boolean'
     ];
+
+    public function getQuestionAttribute($value){
+        return $value ?? "";
+    }
+
+    public function getDescriptionAttribute($value){
+        return $value ?? "";
+    }
     
 }

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\Questionnaire;
 use App\Functions\GlobalFunction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\QuestionnaireRequest;
 use App\Http\Resources\QuestionnaireResource;
 
 class QuestionnaireController extends Controller
@@ -21,21 +22,14 @@ class QuestionnaireController extends Controller
     {   
         $status = $request->query('status');
         
-        $Questionnaire = Forms::
-        with('sections.questions')
-        ->when($status === "inactive", function ($query) {
-            $query->onlyTrashed();
-        })
-
-        ->orderBy('created_at', 'desc')
-        ->get();
+        $Questionnaire = Forms::get();
         
         $is_empty = $Questionnaire->isEmpty();
 
         if ($is_empty) {
             return GlobalFunction::response_function(Message::NOT_FOUND, $Questionnaire);
         }
-            QuestionnaireResource::collection($Questionnaire);
+             QuestionnaireResource::collection($Questionnaire);
             return GlobalFunction::response_function(Message::QUESTIONNAIRE_DISPLAY, $Questionnaire);
 
     }
@@ -47,37 +41,10 @@ class QuestionnaireController extends Controller
         }
 
         $questionnaire = Forms::create([
-            "title" => $request->form['title'],
-            "description" => $request->form['description'],
+            "title" => $request['title'],
+            "description" => $request['description'],
+            "sections" => $request['sections'],
         ]);
-
-        // Loop through sections
-        foreach ($request->section as $sectionData) {
-            // Create section
-            $section = Sections::create([
-                "section" => $sectionData['section'],
-                "name" => $sectionData['name'],
-                "description" => $sectionData['description'],
-                "next_section" => $sectionData['next_section'],
-            ]);
-
-             $questionnaire->sections()->attach($section->id);
-
-            // Loop through questions
-            foreach ($sectionData['questions'] as $questionData) {
-                // Create question
-               $question = Questions::create([
-                    "question" => $questionData['question'],
-                    "description" => $questionData['description'],
-                    "type" => $questionData['type'],
-                    "required" => $questionData['required'],
-                    "options" => $questionData['options']
-                ]);
-                
-                $section->questions()->attach($question->id);
-
-            }
-        }
 
         return GlobalFunction::response_function(Message::QUESTIONNAIRE_SAVE, $questionnaire);
         
@@ -93,46 +60,11 @@ class QuestionnaireController extends Controller
 
          // Update the existing form
         $questionnaire->update([
-            "title" => $request->form['title'],
-            "description" => $request->form['description'],
+            "title" => $request['title'],
+            "description" => $request['description'],
+            "sections" => $request['sections'],
         ]);
 
-        // Loop through sections
-        foreach ($request->section as $sectionData) {
-            $section = Sections::updateOrCreate(
-                // Find or create section by id
-                ['id' => $sectionData['id']], 
-                [
-                    "section" => $sectionData['section'],
-                    "name" => $sectionData['name'],
-                    "description" => $sectionData['description'],
-                    "next_section" => $sectionData['next_section'],
-                ]
-            );
-
-            $questionnaire->sections()->syncWithoutDetaching($section->id);
-
-            // Loop through questions
-            foreach ($sectionData['questions'] as $questionData) {
-        
-                $question = Questions::updateOrCreate(
-                    // Find or create question by id
-                    ['id' => $questionData['id']],
-                    [
-                        "question" => $questionData['question'],
-                        "description" => $questionData['description'],
-                        "type" => $questionData['type'],
-                        "required" => $questionData['required'],
-                        "options" => $questionData['options']
-                    ]
-            );
-
-            $section->questions()->syncWithoutDetaching($question->id);
-           
-        }
-
-        }
-       
         return GlobalFunction::response_function(Message::QUESTIONNAIRE_UPDATE, $questionnaire);
     }
 

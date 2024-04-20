@@ -19,7 +19,6 @@ class QuestionnaireResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'sections' => $this->sections,
-            'is_active' => $this->is_active
         ];
     }
 }
