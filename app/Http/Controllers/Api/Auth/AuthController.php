@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
 use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\ForgetPasswordRequest;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -65,6 +66,22 @@ class AuthController extends Controller
         $username = $user->username;
 
         $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+    
+        return GlobalFunction::response_function(Message::CHANGE_PASSWORD);
+    }
+
+    public function forgetPassword(ForgetPasswordRequest $request, $mobileNumber){
+
+    
+        $id = User::where('contact_details', $mobileNumber)->first();
+
+        if (!$id) {
+            return GlobalFunction::not_found(Message::NOT_FOUND);
+        }
+        
+        $id->update([
             'password' => Hash::make($request->new_password),
         ]);
     

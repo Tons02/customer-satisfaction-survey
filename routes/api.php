@@ -27,16 +27,19 @@ use App\Http\Controllers\Api\QuestionClassificationController;
 Route::post('login',[AuthController::class,'login']);
 
 // SMS Controller
-Route::post('send-verification-code-reset-password', [SmsController::class, 'sendverificationcoderesetpassword'])->middleware('throttle:1,1'); 
+Route::post('send-verification-code-reset-password', [SmsController::class, 'sendverificationcoderesetpassword'])->middleware('throttle:10,1'); 
 Route::post('send-verification-code', [SmsController::class, 'sendverificationcode'])->middleware('throttle:1,1'); 
 Route::post('validate-code', [SmsController::class, 'validatecode'])->middleware('throttle:5,1'); 
 
+//forget password 
+Route::patch('forgetpassword/{mobileNumber}',[AuthController::class,'forgetPassword']);
+
+Route::patch('resetpassword/{id}',[AuthController::class,'resetPassword']);
 
 Route::group(["middleware" => ["auth:sanctum"]], function () {
 
     //Auth Controller
     Route::patch('changepassword',[AuthController::class,'changedPassword']);
-    Route::patch('resetpassword/{id}',[AuthController::class,'resetPassword']);
     Route::post('logout',[AuthController::class,'logout']);
 
     //Role Controller

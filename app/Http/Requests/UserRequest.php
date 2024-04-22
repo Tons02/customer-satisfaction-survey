@@ -30,7 +30,8 @@ class UserRequest extends FormRequest
             "personal_info.first_name" => "sometimes:required", 
             "personal_info.last_name" => "sometimes:required",
             "personal_info.contact_details" => [
-                "regex:/^\+63\d{11}$/",
+                "unique:users,contact_details," . $this->route()->user,
+                "regex:/^\+63\d{10}$/",
             ],
             "personal_info.sex" => "sometimes:required",
             "username" => [
@@ -47,6 +48,7 @@ class UserRequest extends FormRequest
         return [
             "personal_info.id_no.unique" => "The employee ID has already been taken",
             "personal_info.contact_details.regex" => "The mobile number field format is invalid.",
+            "personal_info.contact_details.unique" => "The contact number has already been taken.",
         ];
     }
 

@@ -66,6 +66,7 @@ class UserController extends Controller
             return GlobalFunction::response_function(Message::NOT_FOUND, $users);
         }
 
+        $userID->contact_details = $request["personal_info"]["contact_details"];
         $userID->username = $request['username'];
         $userID->role_id = $request['role_id'];
 

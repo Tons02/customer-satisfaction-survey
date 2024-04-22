@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SmsForgetPasswordRequest extends FormRequest
+class ForgetPasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,17 +22,19 @@ class SmsForgetPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "mobile_number" => [
-                "regex:/^\+63\d{10}$/",
-                "exists:users,contact_details"
+            'new_password' => [
+                'required',
+                'min:4',
+                'different:old_password',
             ],
-        ];
-    }
-    public function messages()
-    {
-        return [
-            "mobile_number.exists" => "The mobile number is not associated with any users.",
+            'confirm_password' => 'required_with:new_password|same:new_password|min:4',
         ];
     }
 
+    public function messages()
+    {
+        return [
+            "new_password.not_in" => "The new password and username must be different",
+        ];
+    }
 }
