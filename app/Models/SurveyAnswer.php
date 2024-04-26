@@ -28,6 +28,7 @@ class SurveyAnswer extends Model
         'valid_until',
         'next_voucher_date',
         'claim',
+        'done',
         'is_active',
     ];
 
@@ -41,6 +42,7 @@ class SurveyAnswer extends Model
     protected $casts = [
         'mobile_number_verified' => 'boolean',
         'questionnaire_answer' => 'json',
+        'done' => 'boolean',
         'is_active' => 'boolean'
     ];
 

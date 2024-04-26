@@ -27,20 +27,21 @@ use App\Http\Controllers\Api\QuestionClassificationController;
 Route::post('login',[AuthController::class,'login']);
 
 // SMS Controller
-Route::post('send-verification-code-reset-password', [SmsController::class, 'sendverificationcoderesetpassword'])->middleware('throttle:10,1'); 
-Route::post('send-verification-code', [SmsController::class, 'sendverificationcode'])->middleware('throttle:1,1'); 
-Route::post('validate-code', [SmsController::class, 'validatecode'])->middleware('throttle:5,1'); 
+Route::post('send-verification-code-reset-password', [SmsController::class, 'sendverificationcoderesetpassword'])->middleware('throttle:100,1'); 
+Route::post('send-verification-code', [SmsController::class, 'sendverificationcode'])->middleware('throttle:100,1'); 
+Route::post('validate-code', [SmsController::class, 'validatecode'])->middleware('throttle:100,1'); 
 
 //forget password 
 Route::patch('forgetpassword/{mobileNumber}',[AuthController::class,'forgetPassword']);
 
-Route::patch('resetpassword/{id}',[AuthController::class,'resetPassword']);
+
 
 Route::group(["middleware" => ["auth:sanctum"]], function () {
 
     //Auth Controller
     Route::patch('changepassword',[AuthController::class,'changedPassword']);
     Route::post('logout',[AuthController::class,'logout']);
+    Route::patch('resetpassword/{id}',[AuthController::class,'resetPassword']);
 
     //Role Controller
     Route::resource("role", RoleController::class);
@@ -55,7 +56,11 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
     Route::put('questionnaire-archived/{id}',[QuestionnaireController::class,'archived']);
 
     //Survey Answers Controller
+    
     Route::resource("survey-answer", SurveyAnswerController::class);
+    Route::get('survey-answer-entry-code/{entry_code}',[SurveyAnswerController::class,'entryCode']);
+    Route::get('survey-answer-get-id-entry-code/{id}/{entry_code}',[SurveyAnswerController::class,'getSurveyAnswer']);
+    Route::patch('survey-answer-update-survey-answer/{id}',[SurveyAnswerController::class,'updateSurveyAnswer']);
     Route::put('survey-answer-archived/{id}',[SurveyAnswerController::class,'archived']);
 
     //Voucher Validity Controller

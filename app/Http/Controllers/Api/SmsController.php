@@ -56,8 +56,7 @@ class SmsController extends Controller
     public function validatecode(SmsRequest $request){
         
         $otp = new Otp();
-        $otpValue = $otp->validate($request->input('mobile_number'), $request->input('code'));
-
-        return GlobalFunction::response_function($otpValue);
+        return $otpValue = $otp->validate($request->input('mobile_number'), $request->input('code'));
+    
     }
 }

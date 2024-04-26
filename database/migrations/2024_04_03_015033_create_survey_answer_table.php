@@ -24,7 +24,7 @@ return new class extends Migration
             $table->Integer('age');
 
             $table->json('questionnaire_answer');
-            $table->string('voucher_code');
+            $table->string('voucher_code')->nullable();
             $table->timestamp('valid_until');
             $table->timestamp('next_voucher_date');
             $table->string('claim');

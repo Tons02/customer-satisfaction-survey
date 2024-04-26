@@ -41,6 +41,8 @@ class Message
     const SURVEY_ANSWER_UPDATE = "Survey Answer successfully updated.";
     const SURVEY_ANSWER_DISPLAY = "Survey Answer display successfully.";
     const SURVEY_ANSWER_ALREADY_USE = "Unable to Archive, Survey Answer already in used!";
+    const SURVEY_ANSWER_NOT_DONE = "Survey answer not completed.";
+    const SURVEY_ANSWER_ALREADY_DONE = "Survey Answer already in done!";
 
     //SMS OPERATIONS
     const SMS_OTP_SAVE = "OTP sent successfully";

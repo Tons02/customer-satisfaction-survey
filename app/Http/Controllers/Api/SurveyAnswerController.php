@@ -42,6 +42,63 @@ class SurveyAnswerController extends Controller
 
     }
 
+    public function entryCode(Request $request, $entry_code){
+
+         $SurveyAnswer = SurveyAnswer::where('entry_code', $entry_code)
+        ->first();
+
+        if (!$SurveyAnswer) {
+            return GlobalFunction::not_found(Message::NOT_FOUND);
+        }
+        // return $SurveyAnswer->done;
+        if ($SurveyAnswer->done == "1") {
+            return GlobalFunction::not_found(Message::SURVEY_ANSWER_ALREADY_DONE);
+        }
+
+        return GlobalFunction::response_function(Message::SURVEY_ANSWER_NOT_DONE, $SurveyAnswer);
+
+    }
+
+    public function getSurveyAnswer(Request $request, $id, $entry_code){
+
+        $SurveyAnswerId = SurveyAnswer::where('entry_code', $entry_code)
+        ->where('id', $id)
+        ->first();
+        // return $role
+        if (!$SurveyAnswerId) {
+            return GlobalFunction::not_found(Message::NOT_FOUND);
+        }
+
+        if ($SurveyAnswerId->done == "1") {
+            return GlobalFunction::not_found(Message::SURVEY_ANSWER_ALREADY_DONE);
+        }
+
+        return GlobalFunction::response_function(Message::SURVEY_ANSWER_DISPLAY, $SurveyAnswerId);
+
+    }
+
+    public function updateSurveyAnswer(Request $request, $id){
+
+        $SurveyAnswerId = SurveyAnswer::where('id', $id)
+        ->first();
+        // return $role
+        if (!$SurveyAnswerId) {
+            return GlobalFunction::not_found(Message::NOT_FOUND);
+        }
+
+        if ($SurveyAnswerId->done == "1") {
+            return GlobalFunction::not_found(Message::SURVEY_ANSWER_ALREADY_DONE);
+        }
+
+        $SurveyAnswerId->update([
+            "questionnaire_answer" => $request->input('questionnaire_answer'),
+            "done" => 1,
+        ]);
+
+        return GlobalFunction::response_function(Message::SURVEY_ANSWER_DISPLAY, $SurveyAnswerId);
+
+    }
+
     public function store(SurveyAnswerRequest $request)
     {   
          $getNextVoucherDateByMobileNumber = SurveyAnswer::where('mobile_number', $request->input('mobile_number'))
@@ -51,7 +108,7 @@ class SurveyAnswerController extends Controller
                 ->first();
 
         if($getNextVoucherDateByMobileNumber > Carbon::now()){
-            return GlobalFunction::response_function("You have already used your available voucher. Your next available one is on ".$getNextVoucherDateByMobileNumber);
+            return GlobalFunction::invalid("You have already used your available voucher. Your next available one is on ".$getNextVoucherDateByMobileNumber);
         }
         
 
@@ -75,10 +132,11 @@ class SurveyAnswerController extends Controller
             "age" => $request["age"],
 
             "questionnaire_answer" => $request->questionnaire_answer,
-            "voucher_code" => $vouchercode,
+            // "voucher_code" => $vouchercode,
             "valid_until" => $validUntil,
             "next_voucher_date" => Carbon::now()->addDays(90),
             "claim" => "not_yet",
+            "done" => 0,
         ]);
 
         return GlobalFunction::response_function(Message::SURVEY_ANSWER_SAVE, $CreateSurveyAnswer);
@@ -137,7 +195,6 @@ class SurveyAnswerController extends Controller
             ]);
             $SurveyAnswerId->delete();
             return GlobalFunction::response_function(Message::ARCHIVE_STATUS, $SurveyAnswerId);
-
         } 
     }
 
