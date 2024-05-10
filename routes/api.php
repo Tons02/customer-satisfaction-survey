@@ -59,7 +59,7 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
     
     Route::resource("survey-answer", SurveyAnswerController::class);
     Route::get('survey-answer-entry-code/{entry_code}',[SurveyAnswerController::class,'entryCode']);
-    Route::get('survey-answer-get-id-entry-code/{id}/{entry_code}',[SurveyAnswerController::class,'getSurveyAnswer']);
+    Route::get('survey-answer-get-form-history-id/{id}',[SurveyAnswerController::class,'getSurveyAnswer']);
     Route::patch('survey-answer-update-survey-answer/{id}',[SurveyAnswerController::class,'updateSurveyAnswer']);
     Route::put('survey-answer-archived/{id}',[SurveyAnswerController::class,'archived']);
 

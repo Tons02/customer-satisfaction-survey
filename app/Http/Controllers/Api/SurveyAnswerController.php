@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Forms;
 use Ichtrojan\Otp\Otp;
 use App\Response\Message;
+use App\Models\FormHistory;
 use Illuminate\Support\Str;
 use App\Models\SurveyAnswer;
 use Illuminate\Http\Request;
@@ -42,60 +44,20 @@ class SurveyAnswerController extends Controller
 
     }
 
-    public function entryCode(Request $request, $entry_code){
+    public function getSurveyAnswer(Request $request, $id){
 
-         $SurveyAnswer = SurveyAnswer::where('entry_code', $entry_code)
+        $FormHistory = FormHistory::where('survey_id', $id)
         ->first();
-
-        if (!$SurveyAnswer) {
-            return GlobalFunction::not_found(Message::NOT_FOUND);
-        }
-        // return $SurveyAnswer->done;
-        if ($SurveyAnswer->done == "1") {
-            return GlobalFunction::not_found(Message::SURVEY_ANSWER_ALREADY_DONE);
-        }
-
-        return GlobalFunction::response_function(Message::SURVEY_ANSWER_NOT_DONE, $SurveyAnswer);
-
-    }
-
-    public function getSurveyAnswer(Request $request, $id, $entry_code){
-
-        $SurveyAnswerId = SurveyAnswer::where('entry_code', $entry_code)
-        ->where('id', $id)
-        ->first();
-        // return $role
-        if (!$SurveyAnswerId) {
+        
+        if (!$FormHistory) {
             return GlobalFunction::not_found(Message::NOT_FOUND);
         }
 
-        if ($SurveyAnswerId->done == "1") {
+        if ($FormHistory->status == "0") {
             return GlobalFunction::not_found(Message::SURVEY_ANSWER_ALREADY_DONE);
         }
 
-        return GlobalFunction::response_function(Message::SURVEY_ANSWER_DISPLAY, $SurveyAnswerId);
-
-    }
-
-    public function updateSurveyAnswer(Request $request, $id){
-
-        $SurveyAnswerId = SurveyAnswer::where('id', $id)
-        ->first();
-        // return $role
-        if (!$SurveyAnswerId) {
-            return GlobalFunction::not_found(Message::NOT_FOUND);
-        }
-
-        if ($SurveyAnswerId->done == "1") {
-            return GlobalFunction::not_found(Message::SURVEY_ANSWER_ALREADY_DONE);
-        }
-
-        $SurveyAnswerId->update([
-            "questionnaire_answer" => $request->input('questionnaire_answer'),
-            "done" => 1,
-        ]);
-
-        return GlobalFunction::response_function(Message::SURVEY_ANSWER_DISPLAY, $SurveyAnswerId);
+        return GlobalFunction::response_function(Message::SURVEY_ANSWER_DISPLAY, $FormHistory);
 
     }
 
@@ -112,13 +74,17 @@ class SurveyAnswerController extends Controller
         }
         
 
-        if(!$duration = VoucherValidity::get()[0]['duration']){
+        $form = Forms::get()->first();
+
+        if (!$form) {
+            return GlobalFunction::invalid(Message::INVALID_ACTION);
+        }
+        
+        if (!$duration = VoucherValidity::get()[0]['duration']) {
             return GlobalFunction::response_function(Message::INVALID_ACTION);
         }
-
+        
         $validUntil = Carbon::now()->addDays($duration);
-
-        $vouchercode = str_replace('-', '', Str::uuid()) . $validUntil->format('YmdHis');
 
         $CreateSurveyAnswer = SurveyAnswer::create([
             "entry_code" => $request["entry_code"],
@@ -132,17 +98,62 @@ class SurveyAnswerController extends Controller
             "age" => $request["age"],
 
             "questionnaire_answer" => $request->questionnaire_answer,
-            // "voucher_code" => $vouchercode,
             "valid_until" => $validUntil,
             "next_voucher_date" => Carbon::now()->addDays(90),
             "claim" => "not_yet",
-            "done" => 0,
         ]);
 
-        return GlobalFunction::response_function(Message::SURVEY_ANSWER_SAVE, $CreateSurveyAnswer);
+        $FormHistory = FormHistory::create([
+            "survey_id" => $CreateSurveyAnswer->id,
+            "mobile_number" => $request["mobile_number"],
+            "title" => $form->title,
+            "description" => $form->description,
+            "sections" => $form->sections,
+
+        ]);
+
+        return GlobalFunction::response_function(Message::SURVEY_ANSWER_SAVE, $FormHistory);
         
     }
 
+    public function updateSurveyAnswer(Request $request, $id){
+
+        $SurveyAnswerId = SurveyAnswer::where('id', $id)
+        ->first();
+
+        $FormHistoryId = FormHistory::where('survey_id', $id)
+        ->first();
+        // return $role
+        if (!$SurveyAnswerId) {
+            return GlobalFunction::not_found(Message::NOT_FOUND);
+        }
+
+        if ($SurveyAnswerId->done == "1") {
+            return GlobalFunction::not_found(Message::SURVEY_ANSWER_ALREADY_DONE);
+        }
+
+        if (!$duration = VoucherValidity::get()[0]['duration']) {
+            return GlobalFunction::response_function(Message::INVALID_ACTION);
+        }
+        
+        $validUntil = Carbon::now()->addDays($duration);
+        
+        $voucherCode = substr(str_replace('-', '', Str::uuid()), 0, 6) . $validUntil->format('YmdHis');        
+
+        $SurveyAnswerId->update([
+            "questionnaire_answer" => $request->input('questionnaire_answer'),
+            "voucher_code" => $voucherCode,
+        ]);
+
+        $FormHistoryId->update([
+            "status" => 0,
+        ]);
+
+
+
+        return GlobalFunction::response_function(Message::SURVEY_ANSWER_DISPLAY, $SurveyAnswerId);
+
+    }
 
     public function update(SurveyAnswerRequest $request, $id)
     {   

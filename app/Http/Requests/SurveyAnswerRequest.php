@@ -22,7 +22,29 @@ class SurveyAnswerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            
+            "entry_code" => [
+                "required",
+            ],
+            "first_name" => [
+                "required",
+            ],
+            "last_name" => [
+                "required",
+            ],
+            "mobile_number" => [
+                "regex:/^\+63\d{10}$/"
+            ],
+            "mobile_number_verified" => [
+                'required',
+                'in:1'
+            ],
+            "gender" => [
+                'required',
+                'in:male,female',
+            ],
+            "age" => [
+                'required',
+            ],
         ];
     }
 }

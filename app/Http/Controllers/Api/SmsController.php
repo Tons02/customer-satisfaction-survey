@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use Carbon\Carbon;
 use Ichtrojan\Otp\Otp;
 use App\Response\Message;
+use App\Models\SurveyAnswer;
 use Illuminate\Http\Request;
 use App\Functions\GlobalFunction;
 use App\Http\Requests\SmsRequest;
@@ -15,6 +17,16 @@ class SmsController extends Controller
 {
     
     public function sendverificationcode(SmsRequest $request){
+        $getNextVoucherDateByMobileNumber = SurveyAnswer::where('mobile_number', $request->input('mobile_number'))
+        ->get()
+        ->sortByDesc('created_at')
+        ->pluck(['next_voucher_date'])
+        ->first();
+
+        if($getNextVoucherDateByMobileNumber > Carbon::now()){
+            return GlobalFunction::invalid("You have already used your available voucher. Your next available one is on ".$getNextVoucherDateByMobileNumber);
+        }
+
         $otp = new Otp();
         $otpValue = $otp->generate($request->input('mobile_number'), 'numeric', 6, 10);
         
