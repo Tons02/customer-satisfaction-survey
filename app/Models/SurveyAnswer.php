@@ -45,9 +45,5 @@ class SurveyAnswer extends Model
         'done' => 'boolean',
         'is_active' => 'boolean'
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id')->withTrashed();
-    }
+    
 }

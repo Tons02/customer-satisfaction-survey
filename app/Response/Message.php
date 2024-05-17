@@ -44,6 +44,17 @@ class Message
     const SURVEY_ANSWER_NOT_DONE = "Survey answer not completed.";
     const SURVEY_ANSWER_ALREADY_DONE = "Survey Answer already in done!";
 
+    //CHECKING SURVEY
+    const CHECK_SURVEY_VALID = "Continue to survey";
+    const CHECK_SURVEY_INVALID = "Survey not exist";
+
+
+    //REGISTER FORM
+    const REGISTRATION_SUCCESSFULLY = "Registration successfully";
+    const ENTRY_CODE_AVAILABLE = "Entry code available";
+    const ENTRY_CODE_NOT_DONE = "Survey Answer not done";
+    const ENTRY_CODE_ALREADY_CLAIMED = "Entry code already claimed";
+
     //SMS OPERATIONS
     const SMS_OTP_SAVE = "OTP sent successfully";
     const SMS_OTP_UPDATE = "Survey Answer successfully updated.";

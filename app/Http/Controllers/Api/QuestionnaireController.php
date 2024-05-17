@@ -50,7 +50,7 @@ class QuestionnaireController extends Controller
         
     }
 
-    public function update(Request $request, $id)
+    public function update(QuestionnaireRequest $request, $id)
     {   
         $questionnaire = Forms::find($id);
 

@@ -28,7 +28,7 @@ return new class extends Migration
             $table->timestamp('valid_until');
             $table->timestamp('next_voucher_date');
             $table->string('claim');
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active');
             $table->timestamps();
             $table->softDeletes();
 

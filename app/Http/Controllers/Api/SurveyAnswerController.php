@@ -44,32 +44,121 @@ class SurveyAnswerController extends Controller
 
     }
 
-    public function getSurveyAnswer(Request $request, $id){
+    public function getSurveyAnswer(Request $request, $id, $security_code, $entry_code){
 
         $FormHistory = FormHistory::where('survey_id', $id)
+        ->where('security_code', $security_code)
         ->first();
         
         if (!$FormHistory) {
-            return GlobalFunction::not_found(Message::NOT_FOUND);
-        }
+            $SurveyId = SurveyAnswer::where('id', $id)
+            ->where('entry_code', $entry_code)
+            ->first();
 
-        if ($FormHistory->status == "0") {
+            if (!$SurveyId) {
+                return GlobalFunction::response_function(Message::NOT_FOUND, $SurveyId);
+            }
+
             return GlobalFunction::not_found(Message::SURVEY_ANSWER_ALREADY_DONE);
+
         }
 
         return GlobalFunction::response_function(Message::SURVEY_ANSWER_DISPLAY, $FormHistory);
 
     }
 
-    public function store(SurveyAnswerRequest $request)
-    {   
-         $getNextVoucherDateByMobileNumber = SurveyAnswer::where('mobile_number', $request->input('mobile_number'))
-                ->get()
-                ->sortByDesc('created_at')
-                ->pluck(['next_voucher_date'])
-                ->first();
+    public function checkEntryCode(Request $request, $mobile_number, $entry_code){
+        
+        $validator = \Validator::make(
+            [
+                'mobile_number' => $mobile_number,
+                'entry_code' => $entry_code    
+            ],
+            [
+                'mobile_number' => ['required', 'regex:/^\+63\d{10}$/'],
+                'entry_code' => ['required']
+            ]
+        );
+    
+        if ($validator->fails()) {
+            return response()->json(['error' => 'Invalid mobile number format.'], 400);
+        }
 
-        if($getNextVoucherDateByMobileNumber > Carbon::now()){
+        $VoucherId = SurveyAnswer::where('mobile_number', $mobile_number)
+            ->where('entry_code', $entry_code)
+            ->first();
+
+        if($VoucherId){
+
+            if($VoucherId->next_voucher_date > Carbon::now() && $VoucherId->is_active == 1){
+                
+                if($VoucherId->valid_until > Carbon::now()){
+                    return GlobalFunction::response_function(
+                        "You have already used your available voucher. Your next available one is on ".$VoucherId->next_voucher_date, 
+                        [
+                            "voucher_code" => $VoucherId->voucher_code,
+                            "valid_until" => $VoucherId->valid_until,
+                            "status" => 'available'
+                        ]
+                    );
+                }
+
+                return GlobalFunction::response_function(
+                    "You have already used your available voucher. Your next available one is on ".$VoucherId->next_voucher_date, 
+                    [
+                        "voucher_code" => $VoucherId->voucher_code,
+                        "valid_until" => $VoucherId->valid_until,
+                        "status" => 'expired'
+                    ]
+                );
+
+            }
+        }
+        
+        if (!$VoucherId) {
+            return GlobalFunction::response_function(
+                Message::ENTRY_CODE_AVAILABLE, 
+                [
+                    'entry_code' => $entry_code, 
+                    'mobile_number' =>  $mobile_number, 
+                    'status' => "available"
+                ]
+             );
+        }
+
+        if ( $VoucherId->voucher_code == null) {
+            $FormHistoryId = FormHistory::where('survey_id',  $VoucherId->id)
+            ->first();
+
+            if (!$FormHistoryId) {
+                return GlobalFunction::response_function(Message::NOT_FOUND, $FormHistoryId);
+            }
+
+            return GlobalFunction::not_found(
+                Message::ENTRY_CODE_NOT_DONE, 
+                [
+                    'entry_code' => $entry_code, 
+                    'survey_id' => $VoucherId->id, 
+                    'security_code' => $FormHistoryId->security_code, 
+                    'status' => "not done"
+                ]
+            );
+        }
+
+    }
+
+    public function createSurvey(SurveyAnswerRequest $request)
+    {   
+        $getNextVoucherDateByMobileNumber = SurveyAnswer::where('mobile_number', $request->input('mobile_number'))
+            ->get()
+            ->pluck(['next_voucher_date'])
+            ->first();
+
+         $getSurveyFormIfDone = SurveyAnswer::where('mobile_number', $request->input('mobile_number'))
+            ->get()
+            ->first();
+
+        if($getNextVoucherDateByMobileNumber > Carbon::now() && $getSurveyFormIfDone->is_active == 1){
             return GlobalFunction::invalid("You have already used your available voucher. Your next available one is on ".$getNextVoucherDateByMobileNumber);
         }
         
@@ -86,6 +175,13 @@ class SurveyAnswerController extends Controller
         
         $validUntil = Carbon::now()->addDays($duration);
 
+        SurveyAnswer::where('mobile_number', $request->input('mobile_number'))
+        ->where('is_active', 0)
+        ->forceDelete();
+
+        $security = substr(str_replace('-', '', Str::uuid()), 0, 6) . $validUntil->format('YmdHis');
+
+
         $CreateSurveyAnswer = SurveyAnswer::create([
             "entry_code" => $request["entry_code"],
             "first_name" => $request["first_name"],
@@ -101,22 +197,25 @@ class SurveyAnswerController extends Controller
             "valid_until" => $validUntil,
             "next_voucher_date" => Carbon::now()->addDays(90),
             "claim" => "not_yet",
+            "is_active" => 0,
         ]);
 
         $FormHistory = FormHistory::create([
             "survey_id" => $CreateSurveyAnswer->id,
+            "security_code" => $security,
             "mobile_number" => $request["mobile_number"],
             "title" => $form->title,
             "description" => $form->description,
             "sections" => $form->sections,
-
         ]);
 
-        return GlobalFunction::response_function(Message::SURVEY_ANSWER_SAVE, $FormHistory);
+        return GlobalFunction::response_function(Message::REGISTRATION_SUCCESSFULLY, $FormHistory);
         
     }
 
     public function updateSurveyAnswer(Request $request, $id){
+
+        return $request->input('questionnaire_answer');
 
         $SurveyAnswerId = SurveyAnswer::where('id', $id)
         ->first();
@@ -128,7 +227,7 @@ class SurveyAnswerController extends Controller
             return GlobalFunction::not_found(Message::NOT_FOUND);
         }
 
-        if ($SurveyAnswerId->done == "1") {
+        if ($SurveyAnswerId->is_active == "1") {
             return GlobalFunction::not_found(Message::SURVEY_ANSWER_ALREADY_DONE);
         }
 
@@ -143,15 +242,15 @@ class SurveyAnswerController extends Controller
         $SurveyAnswerId->update([
             "questionnaire_answer" => $request->input('questionnaire_answer'),
             "voucher_code" => $voucherCode,
+            "is_active" => 1,
         ]);
 
-        $FormHistoryId->update([
-            "status" => 0,
-        ]);
+        
 
+        FormHistory::where('mobile_number', $SurveyAnswerId->mobile_number)
+        ->delete();
 
-
-        return GlobalFunction::response_function(Message::SURVEY_ANSWER_DISPLAY, $SurveyAnswerId);
+        return GlobalFunction::response_function(Message::SURVEY_ANSWER_SAVE, $SurveyAnswerId);
 
     }
 

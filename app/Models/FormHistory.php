@@ -4,13 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\softDeletes;
 
 class FormHistory extends Model
 {
-    use HasFactory, softDeletes;
+    use HasFactory;
     protected $fillable = [
         'survey_id',
+        'security_code',
         'mobile_number',
         'title',
         'description',

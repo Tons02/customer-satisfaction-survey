@@ -23,51 +23,21 @@ class QuestionnaireRequest extends FormRequest
     {
         return [
             //form
-            "form.title" => [
+            "title" => [
                 "required",
             ],
-
-            //section
-            "section.id" => [
+            "sections" => [
                 "required",
             ],
-            "section.section" => [
-                "required",
-            ],
-            "section.name" => [
-                "required",
-            ],
-
-            //question
-            "section.question.id" => [
-                "required",
-            ],
-            "section.question.question" => [
-                "required",
-            ],
-            "section.question.type" => [
-                "required",
-            ],
-            "section.question.required" => [
-                "required",
-            ],
+            
         ];
     }
 
     public function messages()
     {
         return [
-            "form.title.required" => "The form title field is required.",
+            "sections.name.required" => "The section title field is required.",
 
-            "section.id.required" => "The section id is required.",
-            "section.section.required" => "The section is required.",
-            "section.name.required" => "The section name is required.",
-
-            
-            "section.question.id.required" => "The question id is required.",
-            "section.question.question.required" => "The question is required.",
-            "section.question.type.required" => "The question type is required.",
-            "section.question.required.required" => "The question required is required.",
         ];
     }
 }

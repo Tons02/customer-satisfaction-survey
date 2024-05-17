@@ -26,6 +26,15 @@ use App\Http\Controllers\Api\QuestionClassificationController;
 
 Route::post('login',[AuthController::class,'login']);
 
+//Survey client
+Route::get('survey-answer-get-form-history-id/{id}/{security_code}/{entry_code}',[SurveyAnswerController::class,'getSurveyAnswer']);
+Route::get('check-survey/{survey_id}/{security_code}',[SurveyAnswerController::class,'checkSurvey']);
+Route::get('register-entry-code-checker/{mobile_number}/{entry_code}',[SurveyAnswerController::class,'checkEntryCode']);
+Route::post('create-survey',[SurveyAnswerController::class,'createSurvey']);
+Route::patch('survey-answer-update-survey-answer/{id}',[SurveyAnswerController::class,'updateSurveyAnswer']);
+
+
+
 // SMS Controller
 Route::post('send-verification-code-reset-password', [SmsController::class, 'sendverificationcoderesetpassword'])->middleware('throttle:100,1'); 
 Route::post('send-verification-code', [SmsController::class, 'sendverificationcode'])->middleware('throttle:100,1'); 
@@ -58,9 +67,6 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
     //Survey Answers Controller
     
     Route::resource("survey-answer", SurveyAnswerController::class);
-    Route::get('survey-answer-entry-code/{entry_code}',[SurveyAnswerController::class,'entryCode']);
-    Route::get('survey-answer-get-form-history-id/{id}',[SurveyAnswerController::class,'getSurveyAnswer']);
-    Route::patch('survey-answer-update-survey-answer/{id}',[SurveyAnswerController::class,'updateSurveyAnswer']);
     Route::put('survey-answer-archived/{id}',[SurveyAnswerController::class,'archived']);
 
     //Voucher Validity Controller
