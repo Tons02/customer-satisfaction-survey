@@ -42,7 +42,14 @@ class Message
     const SURVEY_ANSWER_DISPLAY = "Survey Answer display successfully.";
     const SURVEY_ANSWER_ALREADY_USE = "Unable to Archive, Survey Answer already in used!";
     const SURVEY_ANSWER_NOT_DONE = "Survey answer not completed.";
-    const SURVEY_ANSWER_ALREADY_DONE = "Survey Answer already in done!";
+    const SURVEY_ANSWER_ALREADY_DONE = "Survey Answer already done!";
+
+    //Voucher
+    const VOUCHER_CLAIM_SUCCESSFULLY = "Voucher successfully claimed";
+
+
+    //QUESTION ANSWER FOR CHARTS
+    const QUESTION_ANSWER_DISPLAY = "Question answers display successfully";
 
     //CHECKING SURVEY
     const CHECK_SURVEY_VALID = "Continue to survey";
@@ -65,6 +72,7 @@ class Message
     const VOUCHER_VALIDITY_UPDATE = "Voucher Validity successfully updated.";
     const VOUCHER_VALIDITY_DISPLAY = "Voucher Validity display successfully.";
     const VOUCHER_VALIDITY_ALREADY_USE = "Unable to Archive, Voucher Validity already in used!";
+    const VOUCHER_VALIDITY_EXTEND = "Voucher validity successfully extended";
     
 
     //GLOBAL MESSAGE

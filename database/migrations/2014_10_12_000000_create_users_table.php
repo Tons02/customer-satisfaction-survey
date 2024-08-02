@@ -20,6 +20,12 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('contact_details')->nullable();
             $table->enum("sex", ["male", "female"]);
+            $table->string('company');
+            $table->string('business_unit');
+            $table->string('department');
+            $table->string('unit');
+            $table->string('sub_unit');
+            $table->string('location');
             $table->string('username')->unique();
             $table->string('password');
             $table->unsignedInteger("role_id")->index();

@@ -34,6 +34,13 @@ class UserRequest extends FormRequest
                 "regex:/^\+63\d{10}$/",
             ],
             "personal_info.sex" => "sometimes:required",
+            "personal_info.company" => "required",
+            "personal_info.business_unit" => "required",
+            "personal_info.department" => "required",
+            "personal_info.unit" => "required",
+            "personal_info.sub_unit" => "required",
+            "personal_info.location" => "required",
+
             "username" => [
                 "required",
                 "unique:users,username," . $this->route()->user,
@@ -49,6 +56,12 @@ class UserRequest extends FormRequest
             "personal_info.id_no.unique" => "The employee ID has already been taken",
             "personal_info.contact_details.regex" => "The mobile number field format is invalid.",
             "personal_info.contact_details.unique" => "The contact number has already been taken.",
+            "personal_info.company.required" => "The company field is required.",
+            "personal_info.business_unit.required" => "The business unit field is required.",
+            "personal_info.department.required" => "The department field is required.",
+            "personal_info.unit.required" => "The unit field is required.",
+            "personal_info.sub_unit.required" => "The sub_unit field is required.",
+            "personal_info.location.required" => "The location field is required.",
         ];
     }
 

@@ -13,12 +13,7 @@ class UserFilters extends QueryFilters
         "middle_name",
         "last_name",
         "contact_details",
-        "sex",
         "username",
-        "location_id",
-        "department_id",
-        "form_template",
-        "company_id",
         "created_at", 
     ];
     
@@ -32,13 +27,13 @@ class UserFilters extends QueryFilters
     ];
 
     protected array $columnSearch = [
-        "id",
+        "id_prefix",
+        "id_no",
         "first_name",
         "middle_name",
         "last_name",
-        "suffix",
-        "gender",
-        "age",
+        "contact_details",
         "username",
+        "created_at", 
     ];
 }

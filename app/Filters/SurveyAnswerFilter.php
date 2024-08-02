@@ -3,36 +3,36 @@
 namespace App\Filters;
 
 use Essa\APIToolKit\Filters\QueryFilters;
+use Illuminate\Database\Eloquent\Builder;
 
 class SurveyAnswerFilter extends QueryFilters
 {
-    
-    protected array $allowedFilters = [
-        "id",
-        "user_id",
-        "questionnaire_answer",
-    ];
     
     protected array $allowedSorts = [
         "updated_at",
         "created_at"
     ];
 
-    protected array $relationSearch = [
-        'user' => [ 
+    protected array $columnSearch = [
         "id",
+        "entry_code",
         "first_name",
         "middle_name",
         "last_name",
         "suffix",
+        "mobile_number",
         "gender",
-        "age",
-        "username"],
+        "birthday",
+        "voucher_code",
+        "valid_until",
+        "next_voucher_date",
     ];
 
-    protected array $columnSearch = [
-        "id",
-        "user_id",
-        "questionnaire_answer",
-    ];
+    
+    // public function claim($claim) {
+    //     $this->builder->when($claim !== null, function($query) use ($claim) {
+    //         $query->where('claim', $claim);
+    //     });
+    // }
+
 }

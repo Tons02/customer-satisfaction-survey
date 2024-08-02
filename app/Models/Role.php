@@ -18,15 +18,15 @@ class Role extends Model
         'is_active',
     ];
 
-    protected $hidden = [
-        "updated_at", 
-        "deleted_at"
-    ];
+        protected $hidden = [
+            "updated_at", 
+            "deleted_at"
+        ];
 
-    protected string $default_filters = RoleFilters::class;
+        protected string $default_filters = RoleFilters::class;
 
-    protected $casts = [
-        'access_permission' => 'json',
-        'is_active' => 'boolean'
-    ];
+        protected $casts = [
+            'access_permission' => 'json',
+            'is_active' => 'boolean'
+        ];
 }

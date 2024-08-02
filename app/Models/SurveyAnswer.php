@@ -22,18 +22,19 @@ class SurveyAnswer extends Model
         'mobile_number',
         'mobile_number_verified',
         'gender',
-        'age',
+        'birthday',
         'questionnaire_answer',
         'voucher_code',
         'valid_until',
         'next_voucher_date',
         'claim',
-        'done',
+        'claim_by_user_id',
+        'submit_date',
         'is_active',
     ];
 
     protected $hidden = [
-        "updated_at", 
+        // "updated_at", 
         "deleted_at"
     ];
 
@@ -45,5 +46,10 @@ class SurveyAnswer extends Model
         'done' => 'boolean',
         'is_active' => 'boolean'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'claim_by_user_id')->withTrashed();
+    }
     
 }

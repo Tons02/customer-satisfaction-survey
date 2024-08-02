@@ -23,28 +23,40 @@ class SurveyAnswerRequest extends FormRequest
     {
         return [
             "entry_code" => [
+                "sometimes:required",
                 "required",
             ],
             "first_name" => [
+                "sometimes:required",
                 "required",
             ],
             "last_name" => [
+                "sometimes:required",
                 "required",
             ],
             "mobile_number" => [
+                "sometimes:required",
                 "regex:/^\+63\d{10}$/"
             ],
             "mobile_number_verified" => [
+                "sometimes:required",
                 'required',
                 'in:1'
             ],
             "gender" => [
+                "sometimes:required",
                 'required',
                 'in:male,female',
             ],
-            "age" => [
+            "birthday" => [
+                "sometimes:required",
                 'required',
+                'date_format:Y-m-d',
             ],
+            "claim_by_user_id" => [
+                "sometimes:required",
+                "required",
+            ]
         ];
     }
 }

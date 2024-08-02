@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('survey_answers', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('entry_code');
+            $table->string('entry_code'); 
             $table->string('first_name');
             $table->string('middle_name')->nullable();
             $table->string('last_name');
@@ -21,13 +21,20 @@ return new class extends Migration
             $table->string('mobile_number');
             $table->boolean('mobile_number_verified');
             $table->enum("gender", ["male", "female"]);
-            $table->Integer('age');
+            $table->string('age');
 
-            $table->json('questionnaire_answer');
+            $table->json('questionnaire_answer')->nullable();
             $table->string('voucher_code')->nullable();
-            $table->timestamp('valid_until');
-            $table->timestamp('next_voucher_date');
-            $table->string('claim');
+            $table->timestamp('valid_until')->nullable();
+            $table->timestamp('next_voucher_date')->nullable();
+            $table->string('claim')->nullable();
+            $table->unsignedInteger("claim_by_user_id")->index()->nullable();
+            $table->foreign("claim_by_user_id")
+            ->references("id")
+            ->on("users")
+            ->onDelete('cascade');
+
+
             $table->boolean('is_active');
             $table->timestamps();
             $table->softDeletes();

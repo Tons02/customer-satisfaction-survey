@@ -24,12 +24,26 @@ class SurveyAnswerResource extends JsonResource
             'mobile_number' => $this->mobile_number,
             'mobile_number_verified' => $this->mobile_number_verified,
             'gender' => $this->gender,
-            'age' => $this->age,
+            'birthday' => $this->birthday,
             'voucher_code' => $this->voucher_code,
+            'valid_until' => $this->valid_until,
             'next_voucher_date' => $this->next_voucher_date,
             'claim' => $this->claim,
+            'claim_by' => $this->user ? [
+                'id' => $this->user->id,
+                'name' => $this->user->first_name . ' ' . $this->user->last_name,
+                'company' => $this->user->company,
+                'business_unit' => $this->user->business_unit,
+                'department' => $this->user->department,
+                'unit' => $this->user->unit,
+                'sub_unit' => $this->user->sub_unit,
+                'location' => $this->user->location,
+            ] : 'unprocessed',                   
             'questionnaire_answer' => $this->questionnaire_answer,
-            'is_active' => $this->is_active
+            'is_active' => $this->is_active,
+            'submit_date' => $this->submit_date,
+            'claim_date' => $this->submit_date == $this->updated_at ? 'unprocessed' : $this->updated_at,
         ];
     }
 }
+    
