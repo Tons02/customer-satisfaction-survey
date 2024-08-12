@@ -23,7 +23,7 @@ class ExtendValidityRequest extends FormRequest
     {
         return [
             'survey_ids' => ['required', 'array'],
-            'survey_ids.*.id' => ['required', 'integer', 'exists:survey_answers,id'],
+            'survey_ids.*' => ['required', 'integer', 'exists:survey_answers,id'],
             'extend_date' => ['required', 'date_format:Y-m-d H:i:s'],
         ];
     }
@@ -31,7 +31,8 @@ class ExtendValidityRequest extends FormRequest
     public function messages()
     {
         return [
-            'survey_ids.*.id.exists' => 'The selected survey ID is invalid.',
+            'survey_ids.*.exists' => 'The selected survey ID is invalid.',
         ];
     }
+
 }

@@ -44,13 +44,13 @@ class SurveyAnswerController extends Controller
             $query->onlyTrashed();        
         })
         ->when($reports === 'submit_date', function($query) use ($from_date, $to_date) {
-                $query->where('submit_date', '>=', $from_date)
-                ->where('submit_date', '<=', $to_date);
-        })
+            $query->whereBetween('submit_date', [$from_date, $to_date]);
+        })     
         ->when($reports === 'claimed_date', function($query) use ($from_date, $to_date) {
-            $query->where('updated_at', '>=', $from_date)
-            ->where('updated_at', '<=', $to_date);
-        })
+            $query->whereBetween('updated_at', [$from_date, $to_date])
+                  ->whereNotNull('claim_by_user_id');
+        })        
+        
         ->when($voucher_code !== null, function($query) use ($voucher_code) {
             $query->where('voucher_code', $voucher_code);
         }, function($query){
@@ -452,20 +452,15 @@ class SurveyAnswerController extends Controller
 
     public function extendVoucher(ExtendValidityRequest $request)
     {
-        // Extract survey IDs and the new date
-       $surveyIds = $request->input('survey_ids');
-       $extendDate = $request->input('extend_date');
+        $surveyIds = $request->input('survey_ids');
+        $extendDate = $request->input('extend_date');
     
-        // Loop through each survey ID and update the valid_until date using Eloquent
-        foreach ($surveyIds as $survey) {
-            SurveyAnswer::where('id', $survey['id'])
-                ->update([
-                    'valid_until' => $extendDate,
-                ]);
-        }
+        SurveyAnswer::whereIn('id', $surveyIds)
+            ->update(['valid_until' => $extendDate]);
+    
         return GlobalFunction::response_function(Message::VOUCHER_VALIDITY_EXTEND);
-
     }
+    
     
 
 }
