@@ -68,9 +68,13 @@ class SurveyAnswerController extends Controller
         if ($is_empty) {
             return GlobalFunction::response_function(Message::NOT_FOUND, $SurveyAnswer);
         }
+
         $SurveyAnswerResource =  SurveyAnswerResource::collection($SurveyAnswer);
         
-        $ResultSurveyAnswer = $request->query('pagination') == 'none' ?  $SurveyAnswerResource =  SurveyAnswerResource::collection($SurveyAnswer) : $SurveyAnswer;
+        $ResultSurveyAnswer = $request->query('pagination') == 'none' 
+        ? ['data' => SurveyAnswerResource::collection($SurveyAnswer)] 
+        : $SurveyAnswer;
+
         return GlobalFunction::response_function(Message::SURVEY_ANSWER_DISPLAY, $ResultSurveyAnswer );
 
     }
