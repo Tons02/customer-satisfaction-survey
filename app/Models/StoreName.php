@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Province;
 use App\Filters\StoreNameFilters;
 use Essa\APIToolKit\Filters\Filterable;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +24,10 @@ class StoreName extends Model
         "deleted_at"
     ];
 
-    
     protected string $default_filters = StoreNameFilters::class;
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class, 'province_id')->withTrashed();
+    }
 }

@@ -9,6 +9,7 @@ use App\Functions\GlobalFunction;
 use App\Http\Controllers\Controller;
 use Essa\APIToolKit\Api\ApiResponse;
 use App\Http\Requests\StoreNameRequest;
+use App\Http\Resources\StoreNameResource;
 
 class StoreNameController extends Controller
 {

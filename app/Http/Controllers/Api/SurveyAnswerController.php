@@ -36,7 +36,7 @@ class SurveyAnswerController extends Controller
         $to_date = $request->query('to_date') ?? '2055-06-11';
          Carbon::parse($to_date)->addDays(1);
         //  return  $to_date=addDays(1);
-        $reports = $request->query('reports') ?? 'claimed_date';
+        $reports = $request->query('reports');
         
         
         $SurveyAnswer = SurveyAnswer::
@@ -49,13 +49,10 @@ class SurveyAnswerController extends Controller
         ->when($reports === 'claimed_date', function($query) use ($from_date, $to_date) {
             $query->whereBetween('updated_at', [$from_date, $to_date])
                   ->whereNotNull('claim_by_user_id');
-        })        
-        
-        ->when($voucher_code !== null, function($query) use ($voucher_code) {
-            $query->where('voucher_code', $voucher_code);
-        }, function($query){
-            
-        })  
+        })      
+        ->when(!empty($voucher_code), function($query) use ($voucher_code) {
+           $query->where('voucher_code', $voucher_code);
+        })
         ->when($voucher_code === null && $claim != null, function($query) use ($claim) {
             $query->where('claim', $claim);
         })  

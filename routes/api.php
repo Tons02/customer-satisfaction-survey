@@ -49,6 +49,13 @@ Route::post('validate-code', [SmsController::class, 'validatecode'])->middleware
 //forget password 
 Route::patch('forgetpassword/{mobileNumber}',[AuthController::class,'forgetPassword']);
 
+
+// public api of province 
+Route::get("province-name-public-api", [ProvinceController::class, 'getAllProvinceNames']);
+
+// public api of store name 
+Route::get("store-name-public-api", [StoreNameController::class, 'getAllStoreNames']);
+
 Route::group(["middleware" => ["auth:sanctum"]], function () {
 
     //Auth Controller
@@ -88,7 +95,6 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
 
     
     //Store Name Controller
-    Route::get("store-name-public-api", [StoreNameController::class, 'getAllStoreNames']);
     Route::resource("store-name", StoreNameController::class);
     Route::put('store-name-archived/{id}',[StoreNameController::class,'archived']);
     

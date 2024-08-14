@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Province;
+use App\Models\StoreName;
 use App\Response\Message;
 use Illuminate\Http\Request;
 use App\Functions\GlobalFunction;
@@ -15,7 +16,7 @@ class ProvinceController extends Controller
 {
     use ApiResponse;
     
-    public function index(Request $request)
+    public function getAllProvinceNames(Request $request)
     {   
         $status = $request->query('status');
         
@@ -83,9 +84,9 @@ class ProvinceController extends Controller
             return GlobalFunction::response_function(Message::RESTORE_STATUS);
         }
 
-        // if (User::where('province_id', $id)->exists()) {
-        //     return GlobalFunction::invalid(Message::PROVINCE_ALREADY_USE);
-        // }
+        if (StoreName::where('province_id', $id)->exists()) {
+            return GlobalFunction::invalid(Message::PROVINCE_ALREADY_USE);
+        }
 
         if (!$province->deleted_at) {
             $province->update([

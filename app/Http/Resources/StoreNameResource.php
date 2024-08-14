@@ -14,6 +14,13 @@ class StoreNameResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'province' => $this->province->name,
+            'store_name' => $this->name,
+            'address' => $this->address,
+            'is_active' => $this->is_active,
+            'created_at' => $this->created_at
+        ];
     }
 }
