@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\AnswerController;
 use App\Http\Controllers\Api\ProvinceController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\StoreNameController;
 use App\Http\Controllers\Api\SurveyAnswerController;
 use App\Http\Controllers\Api\QuestionnaireController;
 use App\Http\Controllers\Api\QuestionAnswerController;
@@ -84,5 +85,11 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
     //Province Controller
     Route::resource("province", ProvinceController::class);
     Route::put('province-archived/{id}',[ProvinceController::class,'archived']);
+
+    
+    //Store Name Controller
+    Route::get("store-name-public-api", [StoreNameController::class, 'getAllStoreNames']);
+    Route::resource("store-name", StoreNameController::class);
+    Route::put('store-name-archived/{id}',[StoreNameController::class,'archived']);
     
 });

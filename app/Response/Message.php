@@ -79,6 +79,12 @@ class Message
     const PROVINCE_UPDATE = "Province successfully updated.";
     const PROVINCE_DISPLAY = "Province display successfully.";
     const PROVINCE_ALREADY_USE = "Unable to Archive, Province already in used!";
+
+    //STORE NAME OPERATIONS
+    const STORE_NAME_SAVE = "Store Name successfully save.";
+    const STORE_NAME_UPDATE = "Store Name successfully updated.";
+    const STORE_NAME_DISPLAY = "Store Name display successfully.";
+    const STORE_NAME_ALREADY_USE = "Unable to Archive, Store Name already in used!";
     
 
     //GLOBAL MESSAGE
