@@ -73,6 +73,12 @@ class Message
     const VOUCHER_VALIDITY_DISPLAY = "Voucher Validity display successfully.";
     const VOUCHER_VALIDITY_ALREADY_USE = "Unable to Archive, Voucher Validity already in used!";
     const VOUCHER_VALIDITY_EXTEND = "Voucher validity successfully extended";
+
+    //PROVINCE OPERATIONS
+    const PROVINCE_SAVE = "Province successfully save.";
+    const PROVINCE_UPDATE = "Province successfully updated.";
+    const PROVINCE_DISPLAY = "Province display successfully.";
+    const PROVINCE_ALREADY_USE = "Unable to Archive, Province already in used!";
     
 
     //GLOBAL MESSAGE

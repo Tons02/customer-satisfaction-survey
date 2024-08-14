@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\SmsController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AnswerController;
+use App\Http\Controllers\Api\ProvinceController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\SurveyAnswerController;
@@ -78,5 +79,10 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
     //Voucher Validity Controller
     Route::resource("voucher-validity", VoucherValidityController::class);
     Route::put('voucher-validity-archived/{id}',[VoucherValidityController::class,'archived']);
+
+    
+    //Province Controller
+    Route::resource("province", ProvinceController::class);
+    Route::put('province-archived/{id}',[ProvinceController::class,'archived']);
     
 });
