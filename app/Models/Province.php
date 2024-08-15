@@ -14,6 +14,7 @@ class Province extends Model
 
     protected $fillable = [
         'name',
+        'is_active',
     ];
 
     protected $hidden = [

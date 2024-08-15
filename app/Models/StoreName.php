@@ -17,6 +17,7 @@ class StoreName extends Model
         'province_id',
         'name',
         'address',
+        'is_active',
     ];
 
     protected $hidden = [
