@@ -43,6 +43,9 @@ class SurveyAnswerController extends Controller
         when($status === "inactive", function ($query) {
             $query->onlyTrashed();        
         })
+        ->when($reports === 'valid_until', function($query) use ($from_date, $to_date) {
+            $query->whereBetween('valid_until', [$from_date, $to_date]);
+        })   
         ->when($reports === 'submit_date', function($query) use ($from_date, $to_date) {
             $query->whereBetween('submit_date', [$from_date, $to_date]);
         })     

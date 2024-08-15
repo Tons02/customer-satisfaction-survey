@@ -23,4 +23,8 @@ class Province extends Model
 
     
     protected string $default_filters = ProvinceFilters::class;
+
+    protected $casts = [
+        'is_active' => 'boolean'
+    ];
 }

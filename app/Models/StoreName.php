@@ -30,4 +30,8 @@ class StoreName extends Model
     {
         return $this->belongsTo(Province::class, 'province_id')->withTrashed();
     }
+    
+    protected $casts = [
+        'is_active' => 'boolean'
+    ];
 }
