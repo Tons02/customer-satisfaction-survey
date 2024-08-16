@@ -129,9 +129,13 @@ class SurveyAnswerController extends Controller
 
     }
 
-    public function checkEntryCode(RegisterCheckingRequest $request, $mobile_number, $entry_code, $first_name, $last_name, $birthday)
+    public function checkEntryCode(RegisterCheckingRequest $request)
 {
-   
+    $mobile_number =  $request->mobile_number;
+    $entry_code =  $request->entry_code;
+    $first_name =  $request->first_name;
+    $last_name =  $request->last_name;
+    $birthday =  $request->birthday;
     // Fetch the latest voucher associated with the mobile number
     $VoucherId = SurveyAnswer::withTrashed()
         ->where('mobile_number', $mobile_number)
@@ -232,7 +236,7 @@ class SurveyAnswerController extends Controller
     );
     
     }else{
-        return GlobalFunction::response_function(
+        return GlobalFunction::invalid(
             Message::INVALID_CREDENTIALS,
            
         );
@@ -271,6 +275,7 @@ class SurveyAnswerController extends Controller
 
      $CreateSurveyAnswer = SurveyAnswer::create([
             "entry_code" => $request["entry_code"],
+            "store_id" => $request["store_id"],
             "first_name" => $request["first_name"],
             "middle_name" => $request["middle_name"],
             "last_name" => $request["last_name"],

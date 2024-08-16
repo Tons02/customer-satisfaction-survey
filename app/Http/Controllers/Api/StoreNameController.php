@@ -33,7 +33,11 @@ class StoreNameController extends Controller
             return GlobalFunction::response_function(Message::NOT_FOUND);
         }
             StoreNameResource::collection($StoreName);
-            return GlobalFunction::response_function(Message::STORE_NAME_DISPLAY,$StoreName);
+           $ResultStoreName = $request->query('pagination') == 'none' 
+            ? ['data' => StoreNameResource::collection($StoreName)] 
+            : $StoreName;
+
+            return GlobalFunction::response_function(Message::STORE_NAME_DISPLAY,$ResultStoreName);
 
     }
 

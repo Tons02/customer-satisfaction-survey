@@ -14,6 +14,11 @@ return new class extends Migration
         Schema::create('survey_answers', function (Blueprint $table) {
             $table->increments('id');
             $table->string('entry_code'); 
+            $table->unsignedInteger("store_id")->index()->nullable();
+            $table->foreign("store_id")
+            ->references("id")
+            ->on("store_names");
+            
             $table->string('first_name');
             $table->string('middle_name')->nullable();
             $table->string('last_name');

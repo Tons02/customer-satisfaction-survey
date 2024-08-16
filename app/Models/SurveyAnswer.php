@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\User;
+use App\Models\StoreName;
 use App\Filters\SurveyAnswerFilter;
 use Essa\APIToolKit\Filters\Filterable;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,7 @@ class SurveyAnswer extends Model
     
     protected $fillable = [ 
         'entry_code',
+        'store_id',
         'first_name',
         'middle_name',
         'last_name',
@@ -43,13 +45,19 @@ class SurveyAnswer extends Model
     protected $casts = [
         'mobile_number_verified' => 'boolean',
         'questionnaire_answer' => 'json',
-        'done' => 'boolean',
         'is_active' => 'boolean'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'claim_by_user_id')->withTrashed();
+    }
+
+    
+
+    public function store()
+    {
+        return $this->belongsTo(StoreName::class, 'store_id')->withTrashed();
     }
     
 }

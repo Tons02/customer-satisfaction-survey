@@ -7,7 +7,10 @@ use Illuminate\Database\Eloquent\Builder;
 
 class SurveyAnswerFilter extends QueryFilters
 {
-    
+    protected array $allowedFilters = [
+        "store_id",
+    ];
+
     protected array $allowedSorts = [
         "updated_at",
         "created_at"
@@ -29,10 +32,9 @@ class SurveyAnswerFilter extends QueryFilters
     ];
 
     
-    // public function claim($claim) {
-    //     $this->builder->when($claim !== null, function($query) use ($claim) {
-    //         $query->where('claim', $claim);
-    //     });
-    // }
+    public function store($store)
+    {
+        $this->builder->where('store_id', $store);
+    }
 
 }

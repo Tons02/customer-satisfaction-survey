@@ -17,6 +17,10 @@ class SurveyAnswerResource extends JsonResource
         return [
             'id' => $this->id,
             'entry_code' => $this->entry_code,
+            'store' => [
+                'id' => $this->store->id,
+                'name' => $this->store->name
+            ],
             'first_name' => $this->first_name,
             'middle_name' => $this->middle_name,
             'last_name' => $this->last_name,
