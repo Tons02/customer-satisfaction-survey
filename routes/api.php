@@ -32,7 +32,7 @@ Route::post('login',[AuthController::class,'login']);
 //Survey client
 Route::get('survey-answer-get-form-history-id/{id}/{security_code}/{entry_code}',[SurveyAnswerController::class,'getSurveyAnswer']);
 Route::get('check-survey/{survey_id}/{security_code}',[SurveyAnswerController::class,'checkSurvey']);
-Route::get('register-entry-code-checker/{mobile_number}/{entry_code}',[SurveyAnswerController::class,'checkEntryCode']);
+Route::get('register-entry-code-checker/{mobile_number?}/{entry_code?}/{first_name?}/{last_name?}/{birthday?}',[SurveyAnswerController::class,'checkEntryCode']);
 
 Route::get("get-done-survey", [SurveyAnswerController::class, 'getPublicDoneSurvey']);
 

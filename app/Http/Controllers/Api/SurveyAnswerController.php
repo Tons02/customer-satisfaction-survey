@@ -20,6 +20,7 @@ use Essa\APIToolKit\Api\ApiResponse;
 use App\Http\Requests\SurveyAnswerRequest;
 use App\Http\Requests\ExtendValidityRequest;
 use App\Http\Resources\SurveyAnswerResource;
+use App\Http\Requests\RegisterCheckingRequest;
 
 class SurveyAnswerController extends Controller
 {
@@ -128,30 +129,30 @@ class SurveyAnswerController extends Controller
 
     }
 
-    public function checkEntryCode(Request $request, $mobile_number, $entry_code)
+    public function checkEntryCode(RegisterCheckingRequest $request, $mobile_number, $entry_code, $first_name, $last_name, $birthday)
 {
-    $validator = \Validator::make(
-        [
-            'mobile_number' => $mobile_number,
-        ],
-        [
-            'mobile_number' => ['required', 'regex:/^\+63\d{10}$/'],
-        ]
-    );
-
-    if ($validator->fails()) {
-        return response()->json(['message' => 'Invalid mobile number format.'], 400);
-    }
-
+   
     // Fetch the latest voucher associated with the mobile number
     $VoucherId = SurveyAnswer::withTrashed()
         ->where('mobile_number', $mobile_number)
-        ->latest('created_at')
         ->first();
-
-    $now = Carbon::now();
+    
+    
 
     if (!$VoucherId) {
+
+        $check_credentials = SurveyAnswer::withTrashed()
+        ->where('first_name', $first_name)
+        ->where('last_name', $last_name)
+        ->where('birthday', $birthday)
+        ->first();
+
+        if($check_credentials && $check_credentials->next_voucher_date > Carbon::now()){
+            return GlobalFunction::invalid(
+                Message::EXIST_CREDENTIALS,
+            );
+        }
+
         return GlobalFunction::response_function(
             Message::ENTRY_CODE_AVAILABLE,
             [
@@ -163,8 +164,10 @@ class SurveyAnswerController extends Controller
     }
 
     // Check if the voucher is valid and active
-    if ($VoucherId->next_voucher_date > $now && $VoucherId->entry_code === $entry_code) {
-        if ($VoucherId->valid_until < $now) {
+    if($VoucherId->entry_code == $entry_code && $VoucherId->mobile_number == $mobile_number && $VoucherId->first_name == $first_name && $VoucherId->last_name == $last_name && $VoucherId->birthday == $birthday){
+        
+    if ($VoucherId->next_voucher_date > Carbon::now() && $VoucherId->entry_code === $entry_code) {
+        if ($VoucherId->valid_until < Carbon::now()) {
             return GlobalFunction::invalid(
                 "You have already used your available voucher. Your next available one is on " . $VoucherId->next_voucher_date,
                 [
@@ -227,6 +230,13 @@ class SurveyAnswerController extends Controller
             'status' => "available"
         ]
     );
+    
+    }else{
+        return GlobalFunction::response_function(
+            Message::INVALID_CREDENTIALS,
+           
+        );
+    }
 }
 
 

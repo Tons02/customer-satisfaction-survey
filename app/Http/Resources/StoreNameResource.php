@@ -16,7 +16,10 @@ class StoreNameResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'province' => $this->province->name,
+            'province' => [
+                'id' => $this->province->id,
+                'name' => $this->province->name
+            ],
             'store_name' => $this->name,
             'address' => $this->address,
             'is_active' => $this->is_active,

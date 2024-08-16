@@ -58,7 +58,10 @@ class StoreNameController extends Controller
             return GlobalFunction::not_found(Message::NOT_FOUND);
         }
 
+        $store_name_id->province_id = $request['province_id'];
         $store_name_id->name = $request['name'];
+        $store_name_id->address = $request['address'];
+        
 
         if (!$store_name_id->isDirty()) {
             return GlobalFunction::response_function(Message::NO_CHANGES);
