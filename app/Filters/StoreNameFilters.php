@@ -26,4 +26,13 @@ class StoreNameFilters extends QueryFilters
     {
         $this->builder->where('province_id', $province);
     }
+
+    // public function province($province)
+    // {
+    //     if ($province !== null) {
+    //         $this->builder->where('province_id', $province);
+    //     }
+    
+    //     return $this; // Returning $this to allow method chaining
+    // }
 }

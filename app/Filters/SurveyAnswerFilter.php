@@ -34,7 +34,11 @@ class SurveyAnswerFilter extends QueryFilters
     
     public function store($store)
     {
-        $this->builder->where('store_id', $store);
+        if ($store !== null) {
+            $this->builder->where('store_id', $store);
+        }
+    
+        return $this; // Returning $this to allow method chaining
     }
-
+    
 }
