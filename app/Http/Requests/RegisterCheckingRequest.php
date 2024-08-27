@@ -13,6 +13,11 @@ class RegisterCheckingRequest extends FormRequest
     {
         return true;
     }
+    
+    public function validationData()
+    {
+        return $this->route()->parameters();
+    }
 
     /**
      * Get the validation rules that apply to the request.
@@ -31,19 +36,16 @@ class RegisterCheckingRequest extends FormRequest
                 'required',
                 'string',
                 'max:10',
-                'not_regex:/\//', // Ensures the input does not contain a forward slash
             ],
             'first_name' => [
                 'required',
                 'string',
                 'max:50',
-                'not_regex:/\//', // Ensures the input does not contain a forward slash
             ],
             'last_name' => [
                 'nullable',
                 'string',
                 'max:50',
-                'not_regex:/\//', // Ensures the input does not contain a forward slash
             ],
         ];
     }
@@ -56,12 +58,13 @@ class RegisterCheckingRequest extends FormRequest
             'mobile_number.not_regex' => 'The mobile number cannot contain a forward slash (/).',
             'entry_code.required' => 'The entry code is required.',
             'entry_code.string' => 'The entry code must be a string.',
-            'entry_code.not_regex' => 'The entry code cannot contain a forward slash (/).',
+            'entry_code.regex' => 'The entry code cannot contain a forward slash (/).',
             'first_name.required' => 'The first name is required.',
             'first_name.string' => 'The first name must be a string.',
-            'first_name.not_regex' => 'The first name cannot contain a forward slash (/).',
+            'first_name.regex' => 'The first name must be uppercase and consist of letters only.',
             'last_name.string' => 'The last name must be a string if provided.',
-            'last_name.not_regex' => 'The last name cannot contain a forward slash (/).',
+            'last_name.regex' => 'The last name must be uppercase and consist of letters only.',
+
         ];
     }
 }

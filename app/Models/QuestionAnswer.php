@@ -30,4 +30,9 @@ class QuestionAnswer extends Model
     {
         return $this->belongsTo(SurveyAnswer::class, 'survey_id');
     }
+
+    // public function store()
+    // {
+    //     return $this->belongsTo(StoreName::class, 'store_id')->withTrashed();
+    // }
 }

@@ -129,29 +129,33 @@ class SurveyAnswerController extends Controller
 
     }
 
-    public function checkEntryCode(RegisterCheckingRequest $request)
+    public function checkEntryCode(RegisterCheckingRequest $request, $mobile_number, $entry_code, $first_name, $last_name, $birthday)
 {
+
     $mobile_number =  $request->mobile_number;
     $entry_code =  $request->entry_code;
     $first_name =  $request->first_name;
     $last_name =  $request->last_name;
     $birthday =  $request->birthday;
+    
     // Fetch the latest voucher associated with the mobile number
     $VoucherId = SurveyAnswer::withTrashed()
         ->where('mobile_number', $mobile_number)
+        ->latest()
         ->first();
     
     
 
     if (!$VoucherId) {
 
-        $check_credentials = SurveyAnswer::withTrashed()
+         $check_credentials = SurveyAnswer::withTrashed()
         ->where('first_name', $first_name)
         ->where('last_name', $last_name)
         ->where('birthday', $birthday)
+        ->latest()
         ->first();
 
-        if($check_credentials && $check_credentials->next_voucher_date > Carbon::now()){
+        if($check_credentials && $check_credentials->next_voucher_date > Carbon::now()) {
             return GlobalFunction::invalid(
                 Message::EXIST_CREDENTIALS,
             );
@@ -167,8 +171,8 @@ class SurveyAnswerController extends Controller
         );
     }
 
-    // Check if the voucher is valid and active
-    if($VoucherId->entry_code == $entry_code && $VoucherId->mobile_number == $mobile_number && $VoucherId->first_name == $first_name && $VoucherId->last_name == $last_name && $VoucherId->birthday == $birthday){
+    
+    if($VoucherId->entry_code === $entry_code && $VoucherId->mobile_number === $mobile_number && $VoucherId->first_name === $first_name && $VoucherId->last_name === $last_name && $VoucherId->birthday === $birthday){
         
     if ($VoucherId->next_voucher_date > Carbon::now() && $VoucherId->entry_code === $entry_code) {
         if ($VoucherId->valid_until < Carbon::now()) {
@@ -208,7 +212,7 @@ class SurveyAnswerController extends Controller
     }
 
     // Check if the voucher is done or not
-    if ($VoucherId->voucher_code == null) {
+    if ($VoucherId->voucher_code == null && $VoucherId->next_voucher_date < Carbon::now()) {
         $FormHistoryId = FormHistory::where('survey_id', $VoucherId->id)->first();
 
         if (!$FormHistoryId) {
@@ -236,9 +240,36 @@ class SurveyAnswerController extends Controller
     );
     
     }else{
-        return GlobalFunction::invalid(
-            Message::INVALID_CREDENTIALS,
-           
+        
+
+        $check_credentials = SurveyAnswer::withTrashed()
+        ->where('first_name', $first_name)
+        ->where('last_name', $last_name)
+        ->where('birthday', $birthday)
+        ->latest()
+        ->first();
+
+        if($check_credentials && $check_credentials->next_voucher_date > Carbon::now()){
+            return GlobalFunction::invalid(
+                Message::INVALID_CREDENTIALS,
+            );
+        }
+
+        
+        if($VoucherId && $VoucherId->next_voucher_date > Carbon::now()){
+            return GlobalFunction::invalid(
+                Message::EXIST_NUMBER,
+            );
+         }
+
+
+        return GlobalFunction::response_function(
+            Message::ENTRY_CODE_AVAILABLE,
+            [
+                'entry_code' => $entry_code,
+                'mobile_number' => $mobile_number,
+                'status' => "available"
+            ]
         );
     }
 }

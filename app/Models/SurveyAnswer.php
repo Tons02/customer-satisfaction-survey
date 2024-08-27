@@ -53,8 +53,6 @@ class SurveyAnswer extends Model
         return $this->belongsTo(User::class, 'claim_by_user_id')->withTrashed();
     }
 
-    
-
     public function store()
     {
         return $this->belongsTo(StoreName::class, 'store_id')->withTrashed();

@@ -12,4 +12,16 @@ class QuestionAnswerFilters extends QueryFilters
     protected array $allowedFilters = [];
 
     protected array $columnSearch = [];
+
+    public function store($store)
+    {
+        if ($store !== null) {
+            $this->builder->whereHas('survey', function ($query) use ($store) {
+                $query->where('store_id', $store); // Assuming 'name' is the column in the stores table
+            });
+        }
+
+        return $this; // Returning $this to allow method chaining
+    }
+
 }
