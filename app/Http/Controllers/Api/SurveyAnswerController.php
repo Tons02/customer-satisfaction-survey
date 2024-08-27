@@ -57,8 +57,20 @@ class SurveyAnswerController extends Controller
         ->when(!empty($voucher_code), function($query) use ($voucher_code) {
            $query->where('voucher_code', $voucher_code);
         })
-        ->when($voucher_code === null && $claim != null, function($query) use ($claim) {
-            $query->where('claim', $claim);
+        ->when($voucher_code === null && $claim != null, function($query) use ($claim, $voucher_code, $reports) {
+            $query->when($voucher_code === null && $claim !== null, function($query) use ($claim, $reports) {
+                if ($claim === 'not_yet' && $reports === 'valid_until') {
+                    // Add multiple conditions using `where` or `orWhere`
+                    $query->where(function($query) use ($claim) {
+                        $query->where('claim', $claim)
+                              ->orWhere('claim', 'not_yet')
+                              ->orWhere('claim', 'expired');
+                    });
+                } else {
+                    // Default case when $claim is not 'not_yet' or $valid_until is not 'valid_until'
+                    $query->where('claim', $claim);
+                }
+            });            
         })  
         ->orderBy('created_at', 'desc')
         ->useFilters()
@@ -506,7 +518,10 @@ class SurveyAnswerController extends Controller
         $extendDate = $request->input('extend_date');
     
         SurveyAnswer::whereIn('id', $surveyIds)
-            ->update(['valid_until' => $extendDate]);
+        ->update([
+            'valid_until' => $extendDate,
+            'claim' => 'not_yet'
+        ]);
     
         return GlobalFunction::response_function(Message::VOUCHER_VALIDITY_EXTEND);
     }

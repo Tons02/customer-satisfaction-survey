@@ -46,7 +46,8 @@ class SurveyAnswerResource extends JsonResource
             'questionnaire_answer' => $this->questionnaire_answer,
             'is_active' => $this->is_active,
             'submit_date' => $this->submit_date,
-            'claim_date' => $this->claim == 'not_yet' ? 'unprocessed' : $this->updated_at,
+            'claim_date' => ($this->claim == 'not_yet' || $this->claim == 'expired') ? 'unprocessed' : $this->updated_at,
+            // 'claim_date' => $this->claim == 'not_yet' ? 'unprocessed' : $this->updated_at,
         ];
     }
 }
