@@ -70,7 +70,13 @@ class QuestionAnswerController extends Controller
                 'answers' => $answers
             ];
         }
-        return GlobalFunction::response_function(Message::QUESTION_ANSWER_DISPLAY, $result);
+        
+        // Wrap the result array in a 'data' key
+        $responseData = [
+            'data' => $result
+        ];
+        
+        return GlobalFunction::response_function(Message::QUESTION_ANSWER_DISPLAY, $responseData);
 
         }
 
@@ -94,6 +100,10 @@ class QuestionAnswerController extends Controller
             ];
         })->values();
 
-        return GlobalFunction::response_function(Message::QUESTION_ANSWER_DISPLAY, $groupedData);
+        $response = [
+                'data' => $groupedData
+        ];
+
+        return GlobalFunction::response_function(Message::QUESTION_ANSWER_DISPLAY, $response);
     }
 }
