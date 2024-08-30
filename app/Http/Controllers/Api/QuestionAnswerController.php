@@ -21,6 +21,7 @@ class QuestionAnswerController extends Controller
         $from_date = $request->query('from_date') ?? '2023-06-11 13:38:07';
         $to_date = $request->query('to_date') ?? '2055-06-11 13:38:07';
         $reports = $request->query('reports') ?? 'updated_at';
+        $store = $request->query('store');
 
         $QuestionAnswers = QuestionAnswer::
          with('survey.store')
@@ -44,41 +45,138 @@ class QuestionAnswerController extends Controller
         if ($is_empty) {
             return GlobalFunction::response_function(Message::NOT_FOUND, $QuestionAnswers);
         }
+        
+        // if ($type === "count") {
+        //     $result = [];
+        //     $stores = [];
+            
+        //     // Group by store and then by question
+        //     foreach ($QuestionAnswers as $qa) {
+        //         $answer = (is_null($qa->answer) || $qa->answer === '') ? "No Answer" : $qa->answer;
+        //         $store_name = $qa->survey->store->name;
+        //         $question = $qa->question;
+        
+        //         // Ensure the store key exists
+        //         if (!isset($stores[$store_name])) {
+        //             $stores[$store_name] = [
+        //                 'store_name' => $store_name,
+        //                 'questions' => []
+        //             ];
+        //         }
+        
+        //         // Ensure the question key exists within the store
+        //         if (!isset($stores[$store_name]['questions'][$question])) {
+        //             $stores[$store_name]['questions'][$question] = [
+        //                 'question' => $question,
+        //                 'answers' => []
+        //             ];
+        //         }
+        
+        //         // Find if the answer already exists in the answers array
+        //         $answerFound = false;
+        //         foreach ($stores[$store_name]['questions'][$question]['answers'] as &$existingAnswer) {
+        //             if ($existingAnswer['answer'] === $answer) {
+        //                 $existingAnswer['count'] += $qa->answer_count;
+        //                 $answerFound = true;
+        //                 break;
+        //             }
+        //         }
+        
+        //         // If the answer was not found, add it to the array
+        //         if (!$answerFound) {
+        //             $stores[$store_name]['questions'][$question]['answers'][] = [
+        //                 'answer' => $answer,
+        //                 'count' => $qa->answer_count
+        //             ];
+        //         }
+        //     }
+        
+        //     // Convert the associative array to an indexed array
+        //     $result = [];
+        //     foreach ($stores as $store) {
+        //         $store['questions'] = array_values($store['questions']); // Convert questions to indexed array
+        //         $result[] = $store;
+        //     }
+        
+        //     // Wrap the result array in a 'data' key
+        //     $responseData = [
+        //         'data' => $result
+        //     ];
+        
+        //     return GlobalFunction::response_function(Message::QUESTION_ANSWER_DISPLAY, $responseData);
+        // }
+
         if ($type === "count") {
             $result = [];
-            $questions = [];
+            $stores = [];
         
-            // Group by question
-        foreach ($QuestionAnswers as $qa) {
-            $answer = (is_null($qa->answer) || $qa->answer === '') ? "No Answer" : $qa->answer;
-            $store_name = $qa->survey->store->name; 
-
-            if (!isset($questions[$qa->question])) {
-                $questions[$qa->question] = [];
+            // Group by store and then by question
+            foreach ($QuestionAnswers as $qa) {
+                $answer = (is_null($qa->answer) || $qa->answer === '') ? "No Answer" : $qa->answer;
+                
+                // If $store is provided, use the actual store name, otherwise use "All stores"\
+                 if ($store != null) {
+                $store_name = $qa->survey->store->name; // Use the actual store name
+                } else {
+                    $store_name = "All store"; // Use "All stores" if no specific store is provided
+                }
+                
+                $question = $qa->question;
+        
+                // Ensure the store key exists
+                if (!isset($stores[$store_name])) {
+                    $stores[$store_name] = [
+                        'store_name' => $store_name,
+                        'questions' => []
+                    ];
+                }
+        
+                // Ensure the question key exists within the store
+                if (!isset($stores[$store_name]['questions'][$question])) {
+                    $stores[$store_name]['questions'][$question] = [
+                        'question' => $question,
+                        'answers' => []
+                    ];
+                }
+        
+                // Find if the answer already exists in the answers array
+                $answerFound = false;
+                foreach ($stores[$store_name]['questions'][$question]['answers'] as &$existingAnswer) {
+                    if ($existingAnswer['answer'] === $answer) {
+                        $existingAnswer['count'] += $qa->answer_count;
+                        $answerFound = true;
+                        break;
+                    }
+                }
+        
+                // If the answer was not found, add it to the array
+                if (!$answerFound) {
+                    $stores[$store_name]['questions'][$question]['answers'][] = [
+                        'answer' => $answer,
+                        'count' => $qa->answer_count
+                    ];
+                }
             }
-            $questions[$qa->question][] = [
-                'store_name' => $store_name,
-                'answer' => $answer,
-                'count' => $qa->answer_count
+        
+            // Convert the associative array to an indexed array
+            $result = [];
+            foreach ($stores as $store) {
+                $store['questions'] = array_values($store['questions']); // Convert questions to indexed array
+                $result[] = $store;
+            }
+        
+            // Wrap the result array in a 'data' key
+            $responseData = [
+                'data' => $result
             ];
-        }
-
-        // Convert grouped questions to the desired array format
-        foreach ($questions as $question => $answers) {
-            $result[] = [
-                'question' => $question,
-                'answers' => $answers
-            ];
+        
+            return GlobalFunction::response_function(Message::QUESTION_ANSWER_DISPLAY, $responseData);
+        } else {
+            // Handle other cases if needed
         }
         
-        // Wrap the result array in a 'data' key
-        $responseData = [
-            'data' => $result
-        ];
         
-        return GlobalFunction::response_function(Message::QUESTION_ANSWER_DISPLAY, $responseData);
-
-        }
+        
 
         //excel
         QuestionAnswerResource::collection($QuestionAnswers); 

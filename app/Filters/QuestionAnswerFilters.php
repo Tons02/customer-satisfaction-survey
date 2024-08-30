@@ -16,12 +16,15 @@ class QuestionAnswerFilters extends QueryFilters
     public function store($store)
     {
         if ($store !== null) {
-            $this->builder->whereHas('survey', function ($query) use ($store) {
-                $query->where('store_id', $store); // Assuming 'name' is the column in the stores table
+            $storeArray = explode(',', $store); // Convert the comma-separated string into an array
+
+            $this->builder->whereHas('survey', function ($query) use ($storeArray) {
+                $query->whereIn('store_id', $storeArray); // Use whereIn for multiple store IDs
             });
         }
 
         return $this; // Returning $this to allow method chaining
     }
+
 
 }
