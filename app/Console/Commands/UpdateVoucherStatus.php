@@ -35,6 +35,7 @@ class UpdateVoucherStatus extends Command
         // Get today's date
         $today = Carbon::now();
 
+        // update the status of not claim voucher set to expired
         SurveyAnswer::where('valid_until', '<', $today)
         ->where('claim', 'not_yet')
         ->update(['claim' => 'expired']);

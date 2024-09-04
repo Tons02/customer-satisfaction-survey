@@ -14,7 +14,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('otp:clean')->hourly();
-        $schedule->command('status:update')->everyMinute();
+        $schedule->command('status:update')->everyMinute(); // update voucher status if expired
+        $schedule->command('app:delete-unanswered-survey-answers')->everyMinute(); // delete uncontinue survey
     }
 
     /**
