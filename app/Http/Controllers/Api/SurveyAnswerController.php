@@ -151,13 +151,13 @@ class SurveyAnswerController extends Controller
     $birthday =  $request->birthday;
     
     // Fetch the latest voucher associated with the mobile number
-    $VoucherId = SurveyAnswer::withTrashed()
+     $VoucherId = SurveyAnswer::withTrashed()
         ->where('mobile_number', $mobile_number)
         ->latest()
         ->first();
-    
-    
 
+    // if false 
+    
     if (!$VoucherId) {
 
          $check_credentials = SurveyAnswer::withTrashed()
@@ -173,6 +173,24 @@ class SurveyAnswerController extends Controller
             );
         }
 
+        if($check_credentials && $check_credentials->next_voucher_date === null) {
+            return GlobalFunction::invalid(
+                Message::EXIST_CREDENTIALS,
+            );
+        }
+
+        return GlobalFunction::response_function(
+            Message::ENTRY_CODE_AVAILABLE,
+            [
+                'entry_code' => $entry_code,
+                'mobile_number' => $mobile_number,
+                'status' => 'available'
+            ]
+        );
+    }
+    
+    // if tapos nayung 40days nya
+    if ($VoucherId->next_voucher_date < Carbon::now() && $VoucherId->next_voucher_date != null) {
         return GlobalFunction::response_function(
             Message::ENTRY_CODE_AVAILABLE,
             [
@@ -183,106 +201,73 @@ class SurveyAnswerController extends Controller
         );
     }
 
-    
-    if($VoucherId->entry_code === $entry_code && $VoucherId->mobile_number === $mobile_number && $VoucherId->first_name === $first_name && $VoucherId->last_name === $last_name && $VoucherId->birthday === $birthday){
+    // check niya lahat ng info if tama 
+    if($VoucherId->entry_code === $entry_code){
+        if($VoucherId->first_name === $first_name && $VoucherId->last_name === $last_name && $VoucherId->birthday === $birthday){
         
-    if ($VoucherId->next_voucher_date > Carbon::now() && $VoucherId->entry_code === $entry_code) {
-        if ($VoucherId->valid_until < Carbon::now()) {
-            return GlobalFunction::invalid(
-                "You have already used your available voucher. Your next available one is on " . $VoucherId->next_voucher_date,
+            if ($VoucherId->next_voucher_date > Carbon::now()) {
+                if ($VoucherId->valid_until < Carbon::now()) {
+                    return GlobalFunction::invalid(
+                        "You have already used your available voucher. Your next available one is on " . $VoucherId->next_voucher_date,
+                        [
+                            'voucher_code' => $VoucherId->voucher_code,
+                            'valid_until' => $VoucherId->valid_until,
+                            'claim' => $VoucherId->claim,
+                            'status' => 'voucher_expired'
+                        ]
+                    );
+                }
+
+                return GlobalFunction::invalid(
+                    "You have already used your available voucher. Your next available one is on " . $VoucherId->next_voucher_date,
+                    [
+                        'voucher_code' => $VoucherId->voucher_code,
+                        'valid_until' => $VoucherId->valid_until,
+                        'claim' => $VoucherId->claim,
+                        'status' => 'voucher_available'
+                    ]
+                );
+            }
+
+            // Check if the voucher is done or not
+            if ($VoucherId->voucher_code == null && $VoucherId->next_voucher_date < Carbon::now()) {
+                $FormHistoryId = FormHistory::where('survey_id', $VoucherId->id)->first();
+
+                if (!$FormHistoryId) {
+                    return GlobalFunction::response_function(Message::NOT_FOUND, $FormHistoryId);
+                }
+
+                return GlobalFunction::not_found(
+                    Message::ENTRY_CODE_NOT_DONE,
+                    [
+                        'entry_code' => $VoucherId->entry_code,
+                        'survey_id' => $VoucherId->id,
+                        'security_code' => $FormHistoryId->security_code,
+                        'status' => "not done"
+                    ]
+                );
+            }
+
+            return GlobalFunction::response_function(
+                Message::ENTRY_CODE_AVAILABLE,
                 [
-                    'voucher_code' => $VoucherId->voucher_code,
-                    'valid_until' => $VoucherId->valid_until,
-                    'claim' => $VoucherId->claim,
-                    'status' => 'voucher_expired'
+                    'entry_code' => $entry_code,
+                    'mobile_number' => $mobile_number,
+                    'status' => "available"
                 ]
             );
+        }else{
+            return GlobalFunction::invalid(
+                Message::INVALID_CREDENTIALS,   
+            );
         }
-
-        return GlobalFunction::invalid(
-            "You have already used your available voucher. Your next available one is on " . $VoucherId->next_voucher_date,
-            [
-                'voucher_code' => $VoucherId->voucher_code,
-                'valid_until' => $VoucherId->valid_until,
-                'claim' => $VoucherId->claim,
-                'status' => 'voucher_available'
-            ]
-        );
-    }
-
-    // Check if the entry code is correct
-    $VoucherId = SurveyAnswer::withTrashed()
-        ->where('mobile_number', $mobile_number)
-        ->where('entry_code', $entry_code)
-        ->latest('created_at')
-        ->first();
-
-    if (!$VoucherId) {
-        return GlobalFunction::invalid(
-            "Invalid Entry Code."
-        );
-    }
-
-    // Check if the voucher is done or not
-    if ($VoucherId->voucher_code == null && $VoucherId->next_voucher_date < Carbon::now()) {
-        $FormHistoryId = FormHistory::where('survey_id', $VoucherId->id)->first();
-
-        if (!$FormHistoryId) {
-            return GlobalFunction::response_function(Message::NOT_FOUND, $FormHistoryId);
-        }
-
-        return GlobalFunction::not_found(
-            Message::ENTRY_CODE_NOT_DONE,
-            [
-                'entry_code' => $VoucherId->entry_code,
-                'survey_id' => $VoucherId->id,
-                'security_code' => $FormHistoryId->security_code,
-                'status' => "not done"
-            ]
-        );
-    }
-
-    return GlobalFunction::response_function(
-        Message::ENTRY_CODE_AVAILABLE,
-        [
-            'entry_code' => $entry_code,
-            'mobile_number' => $mobile_number,
-            'status' => "available"
-        ]
-    );
     
     }else{
-        
 
-        $check_credentials = SurveyAnswer::withTrashed()
-        ->where('first_name', $first_name)
-        ->where('last_name', $last_name)
-        ->where('birthday', $birthday)
-        ->latest()
-        ->first();
-
-        if($check_credentials && $check_credentials->next_voucher_date > Carbon::now()){
-            return GlobalFunction::invalid(
-                Message::INVALID_CREDENTIALS,
-            );
-        }
-
-        
-        if($VoucherId && $VoucherId->next_voucher_date > Carbon::now()){
-            return GlobalFunction::invalid(
-                Message::EXIST_NUMBER,
-            );
-         }
-
-
-        return GlobalFunction::response_function(
-            Message::ENTRY_CODE_AVAILABLE,
-            [
-                'entry_code' => $entry_code,
-                'mobile_number' => $mobile_number,
-                'status' => "available"
-            ]
+        return GlobalFunction::invalid(
+                Message::INVALID_RECEIPT_NUMBER,   
         );
+        
     }
 }
 

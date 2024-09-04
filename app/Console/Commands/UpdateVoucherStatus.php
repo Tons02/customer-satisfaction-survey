@@ -36,7 +36,8 @@ class UpdateVoucherStatus extends Command
         $today = Carbon::now();
 
         SurveyAnswer::where('valid_until', '<', $today)
-            ->update(['claim' => 'expired']);
+        ->where('claim', 'not_yet')
+        ->update(['claim' => 'expired']);
 
         $this->info('Status updated for records with expired valid_until dates.'. $today);
     }

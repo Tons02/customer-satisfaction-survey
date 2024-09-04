@@ -61,8 +61,9 @@ class Message
     const ENTRY_CODE_AVAILABLE = "Entry code available";
     const ENTRY_CODE_NOT_DONE = "Survey Answer not done";
     const ENTRY_CODE_ALREADY_CLAIMED = "Entry code already claimed";
-    const INVALID_CREDENTIALS = "Invalid credentials";
-    const EXIST_CREDENTIALS = "The name is already associated with another number.";
+    const INVALID_CREDENTIALS = "Invalid credentials for this number";
+    const EXIST_CREDENTIALS = "The Firstname, Lastname and Birthday is already used.";
+    const INVALID_RECEIPT_NUMBER = "Invalid receipt number.";
     const EXIST_NUMBER = "The number is already associated with another voucher.";
 
 
