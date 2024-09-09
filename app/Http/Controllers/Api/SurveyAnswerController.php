@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Models\QuestionAnswer;
 use App\Models\VoucherValidity;
 use App\Functions\GlobalFunction;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Essa\APIToolKit\Api\ApiResponse;
 use App\Http\Requests\SurveyAnswerRequest;
@@ -509,6 +510,40 @@ class SurveyAnswerController extends Controller
         ]);
     
         return GlobalFunction::response_function(Message::VOUCHER_VALIDITY_EXTEND);
+    }
+
+    public function getDataChart(Request $request){
+        
+        $data = $request->query('data');
+        $status = $request->query('status');
+        $from_date = $request->query('from_date') ?? '2023-06-11';
+        $to_date = $request->query('to_date') ?? '2055-06-11';
+
+        $ChartData = SurveyAnswer::
+       when($status === "inactive", function ($query) {
+        $query->onlyTrashed();        
+        })
+        ->when($data === 'gender', function($query) use ($from_date, $to_date) {
+            $query->select('gender', DB::raw('count(*) as total'))
+            ->groupBy('gender')
+            ->whereBetween('submit_date', [$from_date, $to_date]);
+        })
+        ->when($data === 'age', function($query) use ($from_date, $to_date) {
+            $query->select(DB::raw('TIMESTAMPDIFF(YEAR, birthday, CURDATE()) as age'), DB::raw('count(*) as total'))
+            ->groupBy('age')
+            ->whereBetween('submit_date', [$from_date, $to_date]);
+        }) 
+       ->useFilters()
+       ->dynamicPaginate();
+
+       $is_empty = $ChartData->isEmpty();
+
+        if ($is_empty) {
+            return GlobalFunction::response_function(Message::NOT_FOUND, $ChartData);
+        }
+
+        return GlobalFunction::response_function(Message::CHART_FOR_AGE, $ChartData );
+   
     }
     
     

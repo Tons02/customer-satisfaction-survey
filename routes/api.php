@@ -77,6 +77,7 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
 
     //Survey Answers Controller
     Route::get("get-survey-answers", [SurveyAnswerController::class, 'getAllSurveyAnswer']);
+    Route::get("get-data-chart", [SurveyAnswerController::class, 'getDataChart']);
     Route::patch("claiming-voucher/{id}", [SurveyAnswerController::class, 'claimingVoucher']);
     Route::patch("extend-voucher", [SurveyAnswerController::class, 'extendVoucher']);
     Route::put('survey-answer-archived/{id}',[SurveyAnswerController::class,'archived']);

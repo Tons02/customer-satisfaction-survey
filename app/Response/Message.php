@@ -90,7 +90,9 @@ class Message
     const STORE_NAME_UPDATE = "Store Name successfully updated.";
     const STORE_NAME_DISPLAY = "Store Name display successfully.";
     const STORE_NAME_ALREADY_USE = "Unable to Archive, Store Name already in used!";
-    
+
+    //CHART MESSAGE
+    const CHART_FOR_AGE = "Chart data display successfully.";
 
     //GLOBAL MESSAGE
     const NO_CHANGES = "No Changes";
