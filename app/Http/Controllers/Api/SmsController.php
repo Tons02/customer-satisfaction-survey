@@ -19,7 +19,7 @@ class SmsController extends Controller
     public function sendverificationcode(SmsRequest $request){
     
         $otp = new Otp();
-        $otpValue = $otp->generate($request->input('mobile_number'), 'numeric', 6, 10);
+        $otpValue = $otp->generate($request->input('mobile_number'), 'numeric', 6, 5);
         
         $otpsms = $otpValue->token;
 
@@ -38,7 +38,7 @@ class SmsController extends Controller
 
     public function sendverificationcoderesetpassword(SmsForgetPasswordRequest $request){
         $otp = new Otp();
-        $otpValue = $otp->generate($request->input('mobile_number'), 'numeric', 6, 1);
+        $otpValue = $otp->generate($request->input('mobile_number'), 'numeric', 6, 3);
         
         $otpsms = $otpValue->token;
 
