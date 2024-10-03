@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Models\QuestionAnswer;
 use App\Models\VoucherValidity;
 use App\Functions\GlobalFunction;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Essa\APIToolKit\Api\ApiResponse;
@@ -512,39 +513,103 @@ class SurveyAnswerController extends Controller
         return GlobalFunction::response_function(Message::VOUCHER_VALIDITY_EXTEND);
     }
 
-    public function getDataChart(Request $request){
-        
+    public function getDataChart(Request $request) {
         $data = $request->query('data');
         $status = $request->query('status');
+        $store = $request->query('store');
         $from_date = $request->query('from_date') ?? '2023-06-11';
         $to_date = $request->query('to_date') ?? '2055-06-11';
-
+    
         $ChartData = SurveyAnswer::
-       when($status === "inactive", function ($query) {
-        $query->onlyTrashed();        
-        })
-        ->when($data === 'gender', function($query) use ($from_date, $to_date) {
-            $query->select('gender', DB::raw('count(*) as total'))
-            ->groupBy('gender')
-            ->whereBetween('submit_date', [$from_date, $to_date]);
-        })
-        ->when($data === 'age', function($query) use ($from_date, $to_date) {
-            $query->select(DB::raw('TIMESTAMPDIFF(YEAR, birthday, CURDATE()) as age'), DB::raw('count(*) as total'))
-            ->groupBy('age')
-            ->whereBetween('submit_date', [$from_date, $to_date]);
-        }) 
-       ->useFilters()
-       ->dynamicPaginate();
-
-       $is_empty = $ChartData->isEmpty();
-
+            when($status === "inactive", function ($query) {
+                $query->onlyTrashed();
+            })
+            ->when($data === 'gender', function($query) use ($from_date, $to_date, $store) {
+                $query->with('store')
+                    ->select('gender', DB::raw('count(*) as total'))
+                    ->when(!is_null($store), function($query) {
+                        $query->addSelect('store_id')->groupBy('gender', 'store_id');
+                    }, function($query) {
+                        $query->groupBy('gender'); // Do not group by store_id when "All store" is selected
+                    })
+                    ->whereBetween('submit_date', [$from_date, $to_date]);
+            })
+            ->when($data === 'age', function($query) use ($from_date, $to_date, $store) {
+                $query->with('store')
+                    ->select(DB::raw('TIMESTAMPDIFF(YEAR, birthday, CURDATE()) as age'), DB::raw('count(*) as total'))
+                    ->when(!is_null($store), function($query) {
+                        $query->addSelect('store_id')->groupBy('age', 'store_id');
+                    }, function($query) {
+                        $query->groupBy('age'); // Do not group by store_id when "All store" is selected
+                    })
+                    ->whereBetween('submit_date', [$from_date, $to_date]);
+            })
+            ->when($data === 'claimed', function($query) use ($from_date, $to_date, $store) {
+                $query->with('store')
+                    ->select(DB::raw("'claim' = 'claimed'"), DB::raw('count(*) as total'))
+                    ->whereBetween('submit_date', [$from_date, $to_date])
+                    ->when(!is_null($store), function($query) {
+                        // If a specific store is selected, group by store_id
+                        $query->addSelect('store_id')->groupBy('claim', 'store_id');
+                    }, function($query) {
+                        // If all stores are selected, group by claim only
+                        $query->groupBy('claim');
+                    });
+            })            
+            ->useFilters()
+            ->dynamicPaginate();
+    
+        $is_empty = $ChartData->isEmpty();
+    
         if ($is_empty) {
             return GlobalFunction::response_function(Message::NOT_FOUND, $ChartData);
         }
-
-        return GlobalFunction::response_function(Message::CHART_FOR_AGE, $ChartData );
-   
+    
+        // Check if $store is null, then set all stores under "All store"
+        if (is_null($store)) {
+            $ChartData = collect([[
+                'store' => 'All store',
+                'data' => $ChartData->map(function ($item) use ($data) {
+                    if ($data === 'gender') {
+                        return [
+                            'gender' => $item->gender,
+                            'total' => $item->total,
+                        ];
+                    } elseif ($data === 'age') {
+                        return [
+                            'age' => $item->age,
+                            'total' => $item->total,
+                        ];
+                    }
+                })->values()
+            ]]);
+        } else {
+            // When a specific store is selected, group by store name
+            $ChartData = $ChartData->groupBy('store.name')->map(function (Collection $items, $storeName) use ($data) {
+                return [
+                    'store' => $storeName,
+                    'data' => $items->map(function ($item) use ($data) {
+                        if ($data === 'gender') {
+                            return [
+                                'gender' => $item->gender,
+                                'total' => $item->total,
+                            ];
+                        } elseif ($data === 'age') {
+                            return [
+                                'age' => $item->age,
+                                'total' => $item->total,
+                            ];
+                        }
+                    })->values()
+                ];
+            })->values();
+        }
+    
+        return GlobalFunction::response_function(Message::CHART_FOR_AGE, $ChartData);
     }
+    
+
+    
     
     
 
