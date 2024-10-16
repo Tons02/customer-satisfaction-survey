@@ -91,6 +91,12 @@ class Message
     const STORE_NAME_DISPLAY = "Store Name display successfully.";
     const STORE_NAME_ALREADY_USE = "Unable to Archive, Store Name already in used!";
 
+    //TRIGGER SET UP OPERATIONS
+    const TRIGGER_SAVE = "Trigger Set Up successfully save.";
+    const TRIGGER_UPDATE = "Trigger Set Up successfully updated.";
+    const TRIGGER_DISPLAY = "Trigger Set Up display successfully.";
+    const TRIGGER_ALREADY_USE = "Unable to Archive, rigger Set Up already in used!";
+
     //CHART MESSAGE
     const CHART_FOR_AGE = "Chart data display successfully.";
 

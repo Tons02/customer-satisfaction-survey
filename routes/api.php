@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\TriggerSetUp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\SmsController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\StoreNameController;
 use App\Http\Controllers\Api\SurveyAnswerController;
+use App\Http\Controllers\Api\TriggerSetUpController;
 use App\Http\Controllers\Api\QuestionnaireController;
 use App\Http\Controllers\Api\QuestionAnswerController;
 use App\Http\Controllers\Api\VoucherValidityController;
@@ -98,5 +100,9 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
     //Store Name Controller
     Route::resource("store-name", StoreNameController::class);
     Route::put('store-name-archived/{id}',[StoreNameController::class,'archived']);
+    
+    //Store Name Controller
+    Route::resource("trigger-setup", TriggerSetUpController::class);
+    Route::put('trigger-setup-archived/{id}',[TriggerSetUpController::class,'archived']);
     
 });

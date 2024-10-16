@@ -33,8 +33,12 @@ class ProvinceController extends Controller
         if ($is_empty) {
             return GlobalFunction::response_function(Message::NOT_FOUND);
         }
-            ProvinceResource::collection($Province);
-            return GlobalFunction::response_function(Message::PROVINCE_DISPLAY,$Province);
+        ProvinceResource::collection($Province);
+        $ResultProvince = $request->query('pagination') == 'none' 
+        ? ['data' => ProvinceResource::collection($Province)] 
+        : $Province;
+
+        return GlobalFunction::response_function(Message::PROVINCE_DISPLAY,$ResultProvince);
 
     }
 
