@@ -34,7 +34,7 @@ class TriggerSetUpController extends Controller
             return GlobalFunction::response_function(Message::TRIGGER_DISPLAY,$TriggerSetUp);
     }
 
-    public function store(Request $request) {
+    public function store(TriggerSetUpRequest $request) {
 
         if (TriggerSetUp::count()){
             return GlobalFunction::response_function(Message::INVALID_ACTION);
