@@ -24,12 +24,12 @@ class TriggerSetUpRequest extends FormRequest
         return [
             'trigger_point' => [
                 'required',
-                'numeric',
+                'integer',
                 'min:1',
                 'lte:limit',  
             ],
-            'limit' => 'required|numeric|min:1',
-            'total' => 'required|numeric',
+            'limit' => 'required|integer|min:1',
+            'total' => 'required|integer',
         ];
     }
 
