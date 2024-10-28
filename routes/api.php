@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\StoreNameController;
 use App\Http\Controllers\Api\SurveyAnswerController;
 use App\Http\Controllers\Api\TriggerSetUpController;
 use App\Http\Controllers\Api\QuestionnaireController;
+use App\Http\Controllers\Api\ReceiptNumberController;
 use App\Http\Controllers\Api\QuestionAnswerController;
 use App\Http\Controllers\Api\VoucherValidityController;
 use App\Http\Controllers\Api\QuestionClassificationController;
@@ -101,8 +102,12 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
     Route::resource("store-name", StoreNameController::class);
     Route::put('store-name-archived/{id}',[StoreNameController::class,'archived']);
     
-    //Store Name Controller
+    //Triggger Setup Controller
     Route::resource("trigger-setup", TriggerSetUpController::class);
     Route::put('trigger-setup-archived/{id}',[TriggerSetUpController::class,'archived']);
+
+    //Receipt Number Controller
+    Route::resource("receipt-number", ReceiptNumberController::class);
+    Route::put('receipt-number-archived/{id}',[ReceiptNumberController::class,'archived']);
     
 });
