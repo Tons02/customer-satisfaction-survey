@@ -97,6 +97,13 @@ class Message
     const TRIGGER_DISPLAY = "Trigger Set Up display successfully.";
     const TRIGGER_ALREADY_USE = "Unable to Archive, rigger Set Up already in used!";
 
+    //RECEIPT NUMBER OPERATIONS
+    const RECEIPT_NUMBER_SAVE = "Receipt Numbers successfully save.";
+    const RECEIPT_NUMBER_UPDATE = "Receipt Numbers successfully updated.";
+    const RECEIPT_NUMBERY_DISPLAY = "Receipt Numbers display successfully.";
+    const RECEIPT_NUMBER_ALREADY_USE = "Unable to Archive, rigger Set Up already in used!";
+    const RECEIPT_NUMBER_LIMIT = "Receipt limit exceeded for this store. No further receipts can be accepted.";
+
     //CHART MESSAGE
     const CHART_FOR_AGE = "Chart data display successfully.";
 

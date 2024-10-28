@@ -18,19 +18,13 @@ class TriggerSetUpController extends Controller
         $status = $request->query('status');
         
         $TriggerSetUp = TriggerSetUp::
-        when($status === "inactive", function ($query) {
-            $query->onlyTrashed();
-        })
-        ->orderBy('created_at', 'desc')
-        ->useFilters()
-        ->dynamicPaginate();
+        get();
         
         $is_empty = $TriggerSetUp->isEmpty();
 
         if ($is_empty) {
-            return GlobalFunction::response_function(Message::NOT_FOUND);
+            return GlobalFunction::response_function(Message::TRIGGER_DISPLAY,$TriggerSetUp);
         }
-            // TriggerSetUpResource::collection($TriggerSetUp);
             return GlobalFunction::response_function(Message::TRIGGER_DISPLAY,$TriggerSetUp);
     }
 
