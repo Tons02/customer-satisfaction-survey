@@ -11,12 +11,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Role extends Model
 {
     use HasFactory, softDeletes, Filterable;
-    protected $fillable = [
-        'id',
-        'name',
-        'access_permission',
-        'is_active',
-    ];
+        protected $fillable = [
+            'id',
+            'name',
+            'access_permission',
+            'is_active',
+        ];
 
         protected $hidden = [
             "updated_at", 

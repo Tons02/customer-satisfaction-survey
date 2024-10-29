@@ -101,8 +101,18 @@ class Message
     const RECEIPT_NUMBER_SAVE = "Receipt Numbers successfully save.";
     const RECEIPT_NUMBER_UPDATE = "Receipt Numbers successfully updated.";
     const RECEIPT_NUMBERY_DISPLAY = "Receipt Numbers display successfully.";
-    const RECEIPT_NUMBER_ALREADY_USE = "Unable to Archive, rigger Set Up already in used!";
     const RECEIPT_NUMBER_LIMIT = "Receipt limit exceeded for this store. No further receipts can be accepted.";
+
+    //SURVEY_INTERVAL OPERATIONS
+    const SURVEY_INTERVAL_SAVE = "Survey interval successfully save.";
+    const SURVEY_INTERVAL_UPDATE = "Survey interval successfully updated.";
+    const SURVEY_INTERVAL_DISPLAY = "Survey interval display successfully.";
+
+     //SURVEY_PERIOD OPERATIONS
+     const SURVEY_PERIOD_SAVE = "Survey period successfully save.";
+     const SURVEY_PERIOD_UPDATE = "Survey period successfully updated.";
+     const SURVEY_PERIOD_DISPLAY = "Survey period display successfully.";
+     const SURVEY_PERIOD_ALREADY_USE = "Unable to Archive, Survey period already in used!";
 
     //CHART MESSAGE
     const CHART_FOR_AGE = "Chart data display successfully.";
@@ -111,6 +121,7 @@ class Message
     const NO_CHANGES = "No Changes";
     const INVALID_STATUS = "Invalid Status";
     const INVALID_ID = "Invalid ID";
+    const ALREADY_EXIST = "Data already exists. Please update your existing data.";
     const NOT_FOUND = "No Data Found";
     const INVALID_ACTION = "Invalid action.";
     const ARCHIVE_STATUS = "Successfully archived.";

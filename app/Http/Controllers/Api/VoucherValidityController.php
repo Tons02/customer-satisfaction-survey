@@ -33,7 +33,7 @@ class VoucherValidityController extends Controller
     public function store(VoucherValidityRequest $request)
     {   
         if (VoucherValidity::count()){
-            return GlobalFunction::response_function(Message::INVALID_ACTION);
+            return GlobalFunction::response_function(Message::ALREADY_EXIST);
         }
 
         $CreateVoucherValidity = VoucherValidity::create([

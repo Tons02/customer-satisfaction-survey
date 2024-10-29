@@ -12,10 +12,12 @@ use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\StoreNameController;
 use App\Http\Controllers\Api\SurveyAnswerController;
+use App\Http\Controllers\Api\SurveyPeriodController;
 use App\Http\Controllers\Api\TriggerSetUpController;
 use App\Http\Controllers\Api\QuestionnaireController;
 use App\Http\Controllers\Api\ReceiptNumberController;
 use App\Http\Controllers\Api\QuestionAnswerController;
+use App\Http\Controllers\Api\SurveyIntervalController;
 use App\Http\Controllers\Api\VoucherValidityController;
 use App\Http\Controllers\Api\QuestionClassificationController;
 
@@ -58,6 +60,9 @@ Route::get("province-name-public-api", [ProvinceController::class, 'getAllProvin
 
 // public api of store name 
 Route::get("store-name-public-api", [StoreNameController::class, 'getAllStoreNames']);
+
+// public api of survey interval 
+Route::get("survey-interval-public-api", [SurveyPeriodController::class, 'getSurveyInterval']);
 
 Route::group(["middleware" => ["auth:sanctum"]], function () {
 
@@ -108,6 +113,13 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
 
     //Receipt Number Controller
     Route::resource("receipt-number", ReceiptNumberController::class);
-    Route::put('receipt-number-archived/{id}',[ReceiptNumberController::class,'archived']);
+
+    //Survey Interval Controller
+    Route::resource("survey-interval", SurveyIntervalController::class);
+
+    //Survey Period Controller
+    Route::resource("survey-period", SurveyPeriodController::class);
+    
+    
     
 });
