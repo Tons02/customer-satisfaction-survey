@@ -100,7 +100,7 @@ class Message
     //RECEIPT NUMBER OPERATIONS
     const RECEIPT_NUMBER_SAVE = "Receipt Numbers successfully save.";
     const RECEIPT_NUMBER_UPDATE = "Receipt Numbers successfully updated.";
-    const RECEIPT_NUMBERY_DISPLAY = "Receipt Numbers display successfully.";
+    const RECEIPT_NUMBER_DISPLAY = "Receipt Numbers display successfully.";
     const RECEIPT_NUMBER_LIMIT = "Receipt limit exceeded for this store. No further receipts can be accepted.";
 
     //SURVEY_INTERVAL OPERATIONS

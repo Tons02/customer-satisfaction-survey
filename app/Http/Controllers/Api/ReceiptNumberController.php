@@ -34,7 +34,7 @@ class ReceiptNumberController extends Controller
             return GlobalFunction::response_function(Message::NOT_FOUND);
         }
             ReceiptNumberResource::collection($ReceiptNumber);
-            return GlobalFunction::response_function(Message::RECEIPT_NUMBER_DISPLAY_DISPLAY,$ReceiptNumber);
+            return GlobalFunction::response_function(Message::RECEIPT_NUMBER_DISPLAY,$ReceiptNumber);
 
     }
 
