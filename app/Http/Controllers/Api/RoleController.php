@@ -18,6 +18,8 @@ class RoleController extends Controller
     
     public function index(Request $request)
     {   
+        $this->authorize('viewany', Role::class);
+
         $status = $request->query('status');
         
         $Role = Role::
@@ -40,6 +42,7 @@ class RoleController extends Controller
 
     public function store(RoleRequest $request)
     {
+        $this->authorize('create', Role::class);
 
         $create_role = Role::create([
             "name" => $request->name,
@@ -57,6 +60,8 @@ class RoleController extends Controller
         if (!$role_id) {
             return GlobalFunction::not_found(Message::NOT_FOUND);
         }
+
+        $this->authorize('update', $role_id);
 
         $role_id->name = $request['name'];
         $role_id->access_permission = $request['access_permission'];
@@ -79,6 +84,8 @@ class RoleController extends Controller
         }
         
         if ($role->deleted_at) {
+            $this->authorize('restore', $role);
+
             $role->update([
                 'is_active' => 1
             ]);
@@ -91,6 +98,8 @@ class RoleController extends Controller
         }
 
         if (!$role->deleted_at) {
+            $this->authorize('delete', $role);
+
             $role->update([
                 'is_active' => 0
             ]);

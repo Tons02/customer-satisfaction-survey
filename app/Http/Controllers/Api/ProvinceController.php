@@ -44,6 +44,8 @@ class ProvinceController extends Controller
 
     public function store(ProvinceRequest $request)
     {
+        
+        $this->authorize('create', Province::class);
 
         $create_province = Province::create([
             "name" => $request->name,
@@ -60,6 +62,8 @@ class ProvinceController extends Controller
         if (!$province_id) {
             return GlobalFunction::not_found(Message::NOT_FOUND);
         }
+
+        $this->authorize('update', $province_id);
 
         $province_id->name = $request['name'];
 
@@ -81,9 +85,13 @@ class ProvinceController extends Controller
         }
         
         if ($province->deleted_at) {
+
+            $this->authorize('restore', $province);
+
             $province->update([
                 'is_active' => 1
             ]);
+            
             $province->restore();
             return GlobalFunction::response_function(Message::RESTORE_STATUS);
         }
@@ -93,6 +101,9 @@ class ProvinceController extends Controller
         }
 
         if (!$province->deleted_at) {
+
+            $this->authorize('delete', $province);
+
             $province->update([
                 'is_active' => 0
             ]);

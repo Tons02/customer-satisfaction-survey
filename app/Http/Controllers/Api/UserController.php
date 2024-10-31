@@ -16,7 +16,8 @@ class UserController extends Controller
     use ApiResponse;
 
     public function index(Request $request){
-        
+        $this->authorize('viewany', User::class);
+
         $status = $request->query('status');
  
         $users = User::
@@ -37,6 +38,8 @@ class UserController extends Controller
     }
 
     public function store(UserRequest $request){
+        
+        $this->authorize('create', User::class);
 
         $create_user = User::create([
             "id_prefix" => $request["personal_info"]["id_prefix"],
@@ -83,6 +86,8 @@ class UserController extends Controller
         if (!$userID) {
             return GlobalFunction::response_function(Message::NOT_FOUND, $users);
         }
+
+        $this->authorize('update', $userID);
 
         $userID->contact_details = $request["personal_info"]["contact_details"];
         $userID->username = $request['username'];
@@ -136,12 +141,17 @@ class UserController extends Controller
         if (!$is_active) {
             return $is_active;
         } elseif (!$is_active->deleted_at) {
+            
+            $this->authorize('delete', $user);
+
             $user->update([
                 'is_active' => 0
             ]);
             $user->delete();
             return GlobalFunction::response_function(Message::ARCHIVE_STATUS);
         } else {
+            $this->authorize('restore', $user);
+
             $user->update([
                 'is_active' => 1
             ]);
