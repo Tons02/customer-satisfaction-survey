@@ -16,6 +16,8 @@ class ReceiptNumber extends Model
         'contact_details',
         'store_id',
         'is_valid',
+        'is_used',
+        'expiration_date',
     ];
 
     protected $hidden = [

@@ -143,14 +143,11 @@ class SurveyAnswerController extends Controller
 
     }
 
-    public function checkEntryCode(RegisterCheckingRequest $request, $mobile_number, $entry_code, $first_name, $last_name, $birthday)
+    public function checkEntryCode(RegisterCheckingRequest $request, $mobile_number, $receipt_number)
 {
 
     $mobile_number =  $request->mobile_number;
-    $entry_code =  $request->entry_code;
-    $first_name =  $request->first_name;
-    $last_name =  $request->last_name;
-    $birthday =  $request->birthday;
+    $receipt_number =  $request->receipt_number;
     
     // Fetch the latest voucher associated with the mobile number
      $VoucherId = SurveyAnswer::withTrashed()

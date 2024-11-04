@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use Carbon\Carbon;
 use App\Response\Message;
+use App\Models\SurveyPeriod;
 use App\Models\TriggerSetUp;
 use Illuminate\Http\Request;
 use App\Models\ReceiptNumber;
+use App\Models\SurveyInterval;
 use App\Functions\GlobalFunction;
 use App\Http\Controllers\Controller;
 use Essa\APIToolKit\Api\ApiResponse;
+use Illuminate\Support\Facades\Http;
 use App\Http\Requests\ReceiptNumberRequest;
 use App\Http\Resources\ReceiptNumberResource;
 
@@ -47,6 +51,9 @@ class ReceiptNumberController extends Controller
 
         // Get the limit and trigger point from the TriggerSetup model
         $triggerSetup = TriggerSetUp::first();
+        if (!$triggerSetup) {
+            return GlobalFunction::not_found(Message::TRIGGER_INVALID);
+        }
         $limit = $triggerSetup->limit; 
         $trigger_point = $triggerSetup->trigger_point; 
 
@@ -59,18 +66,54 @@ class ReceiptNumberController extends Controller
         } else {
             // Check if the current count is a valid trigger point
              $isValid = in_array($count+1, $validTriggerPoints);
-        
         }
 
-        $create_role = ReceiptNumber::create([
-            "receipt_number" => $request->receipt_number,
-            "contact_details" => $request->contact_details,
-            "store_id" => $request->store_id,
-            "is_valid" => $isValid
-        ]);
+        //for the duration of the reciept number 
+       $SurveyIntervalDay = SurveyInterval::first();
+       if (!$SurveyIntervalDay) {
+            return GlobalFunction::not_found(Message::SURVEY_INTERVAL_INVALID);
+        }
+       $SurveyPeriod = SurveyPeriod::first();
+       if (!$SurveyPeriod) {
+        return GlobalFunction::not_found(Message::SURVEY_PERIOD_INVALID);
+        }   
 
-        return GlobalFunction::response_function(Message::RECEIPT_NUMBER_SAVE);
+        $expiryDate = Carbon::today()->addDays($SurveyIntervalDay->days);
+
+        // comment this line if you dont want to limit the claiming base on the valid_to of survey period
+        if($expiryDate > $SurveyPeriod->valid_to){
+            $expiryDate = $SurveyPeriod->valid_to;
+        }
+
+        if ($SurveyPeriod->valid_from <= Carbon::today() && Carbon::today() <= $SurveyPeriod->valid_to) {
+           
+            $create_role = ReceiptNumber::create([
+                "receipt_number" => $request->receipt_number,
+                "contact_details" => $request->contact_details,
+                "store_id" => $request->store_id,
+                "expiration_date" => $expiryDate,
+                "is_valid" => $isValid
+            ]);
+    
+            if($isValid){
+                // Send sms when the reciept number is valid
+                $token = env('SMS_TOKEN');
+                $sms_post = env('SMS_POST');
+    
+                $response = Http::withToken($token)->post($sms_post, [
+                            'system_name' => 'Customer Service Satisfaction',
+                            'message' => 'Fresh Morning! You have been selected to participate in our survey. Your receipt number is ' . $request->receipt_number . '. Please visit the CSS website to complete it.',
+                            'mobile_number' => '09168620219'
+                ]);
+            }
+           
+            return GlobalFunction::response_function(Message::RECEIPT_NUMBER_SAVE);
+         
+        }
+
+        return GlobalFunction::denied(Message::SURVEY_PERIOD_DONE);
         
+         
     }
 
     public function update(ReceiptNumberRequest $request, $id)

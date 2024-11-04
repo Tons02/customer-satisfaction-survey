@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 
@@ -30,10 +31,18 @@ class ReceiptNumberRequest extends FormRequest
                     ? "unique:receipt_numbers,receipt_number," . $this->route('receipt_number') . ",id,store_id," . $this->input('store_id')
                     : "unique:receipt_numbers,receipt_number,NULL,id,store_id," . $this->input('store_id'),
             ],
-           "contact_details" => [
+        // validation for all number
+        //    "contact_details" => [ 
+        //     "required",
+        //     "regex:/^\+63\d{10}$/",
+        //     "unique:receipt_numbers,contact_details," . $this->route('receipt_number'), // Adjust to match route parameter name
+        // ],
+           "contact_details" => [ 
             "required",
             "regex:/^\+63\d{10}$/",
-            "unique:receipt_numbers,contact_details," . $this->route('receipt_number'), // Adjust to match route parameter name
+            Rule::unique('receipt_numbers')->where(function ($query) {
+                return $query->where('is_valid', true); // Only check unique for valid entries
+            })->ignore($this->route('receipt_number')),
         ],
             "store_id" => ["required", "exists:store_names,id"],
         ];
