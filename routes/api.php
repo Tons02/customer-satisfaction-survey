@@ -37,12 +37,12 @@ Route::post('login',[AuthController::class,'login']);
 //Survey client
 Route::get('survey-answer-get-form-history-id/{id}/{security_code}/{entry_code}',[SurveyAnswerController::class,'getSurveyAnswer']);
 Route::get('check-survey/{survey_id}/{security_code}',[SurveyAnswerController::class,'checkSurvey']);
-Route::get('register-entry-code-checker/{mobile_number?}/{receipt_number?}',[SurveyAnswerController::class,'checkEntryCode']);
+Route::get('register-entry-code-checker/{mobile_number}/{receipt_number}/{store_id}',[SurveyAnswerController::class,'checkEntryCode']);
 
 Route::get("get-done-survey", [SurveyAnswerController::class, 'getPublicDoneSurvey']);
 
 Route::post('create-survey',[SurveyAnswerController::class,'createSurvey']);
-Route::patch('survey-answer-update-survey-answer/{id}',[SurveyAnswerController::class,'updateSurveyAnswer']);
+Route::patch('survey-answer-update/{id}',[SurveyAnswerController::class,'updateSurveyAnswer']);
 
 
 

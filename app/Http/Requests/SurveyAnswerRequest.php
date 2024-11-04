@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SurveyAnswerRequest extends FormRequest
@@ -22,9 +23,17 @@ class SurveyAnswerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "entry_code" => [
+            "receipt_number" => [
                 "sometimes:required",
                 "required",
+                Rule::exists('receipt_numbers', 'receipt_number')->where(function ($query) {
+                    $query->where('is_valid', true);
+                })
+            ],
+            "store_id" => [
+                "sometimes:required",
+                "required",
+                "exists:store_names,id"
             ],
             "first_name" => [
                 "sometimes:required",
@@ -36,7 +45,10 @@ class SurveyAnswerRequest extends FormRequest
             ],
             "mobile_number" => [
                 "sometimes:required",
-                "regex:/^\+63\d{10}$/"
+                "regex:/^\+63\d{10}$/",
+                Rule::exists('receipt_numbers', 'contact_details')->where(function ($query) {
+                    $query->where('is_valid', true);
+                })
             ],
             "mobile_number_verified" => [
                 "sometimes:required",
@@ -56,6 +68,7 @@ class SurveyAnswerRequest extends FormRequest
             "claim_by_user_id" => [
                 "sometimes:required",
                 "required",
+                "exists:users,id"
             ]
         ];
     }

@@ -32,20 +32,9 @@ class RegisterCheckingRequest extends FormRequest
                 'regex:/^\+63\d{10}$/',
                 'not_regex:/\//', 
             ],
-            'entry_code' => [
+            'receipt_number' => [
                 'required',
                 'string',
-                'max:10',
-            ],
-            'first_name' => [
-                'required',
-                'string',
-                'max:50',
-            ],
-            'last_name' => [
-                'nullable',
-                'string',
-                'max:50',
             ],
         ];
     }
@@ -56,15 +45,8 @@ class RegisterCheckingRequest extends FormRequest
             'mobile_number.required' => 'The mobile number is required.',
             'mobile_number.regex' => 'The mobile number must start with +63 and be followed by 10 digits.',
             'mobile_number.not_regex' => 'The mobile number cannot contain a forward slash (/).',
-            'entry_code.required' => 'The entry code is required.',
-            'entry_code.string' => 'The entry code must be a string.',
-            'entry_code.regex' => 'The entry code cannot contain a forward slash (/).',
-            'first_name.required' => 'The first name is required.',
-            'first_name.string' => 'The first name must be a string.',
-            'first_name.regex' => 'The first name must be uppercase and consist of letters only.',
-            'last_name.string' => 'The last name must be a string if provided.',
-            'last_name.regex' => 'The last name must be uppercase and consist of letters only.',
-
+            'receipt_number.required' => 'The entry code is required.',
+            'receipt_number.string' => 'The entry code must be a string.',
         ];
     }
 }

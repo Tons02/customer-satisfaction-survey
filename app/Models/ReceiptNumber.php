@@ -17,6 +17,7 @@ class ReceiptNumber extends Model
         'store_id',
         'is_valid',
         'is_used',
+        'is_done',
         'expiration_date',
     ];
 
@@ -30,6 +31,7 @@ class ReceiptNumber extends Model
     protected $casts = [
         'is_valid' => 'boolean',
         'is_used' => 'boolean',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
+        'is_done' => 'boolean'
     ];
 }

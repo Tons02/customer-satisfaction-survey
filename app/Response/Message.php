@@ -47,7 +47,6 @@ class Message
     //Voucher
     const VOUCHER_CLAIM_SUCCESSFULLY = "Voucher successfully claimed";
 
-
     //QUESTION ANSWER FOR CHARTS
     const QUESTION_ANSWER_DISPLAY = "Question answers display successfully";
 
@@ -55,17 +54,21 @@ class Message
     const CHECK_SURVEY_VALID = "Continue to survey";
     const CHECK_SURVEY_INVALID = "Survey not exist";
 
-
     //REGISTER FORM
-    const REGISTRATION_SUCCESSFULLY = "Registration successfully";
-    const ENTRY_CODE_AVAILABLE = "Entry code available";
+    const REGISTRATION_SUCCESSFULLY = "Survey saved successfully";
+    const SURVEY_FORM_INVALID = "No Survey form has been set. Please contact the administrator.";
+    const SURVEY_VALIDITY_INVALID = "No Survey duration has been set. Please contact the administrator.";
     const ENTRY_CODE_NOT_DONE = "Survey Answer not done";
-    const ENTRY_CODE_ALREADY_CLAIMED = "Entry code already claimed";
+    const RECEIPT_NUMBER_AVAILABLE = "Receipt available";
+    const RECEIPT_NUMBER_NOT_DONE = "Survey Answer not done";
+    const RECEIPT_NUMBER_ALREADY_CLAIMED = "Entry code already claimed";
     const INVALID_CREDENTIALS = "Invalid credentials for this number";
     const EXIST_CREDENTIALS = "The Firstname, Lastname and Birthday is already used.";
-    const INVALID_RECEIPT_NUMBER = "Invalid receipt number.";
+    const INVALID_MOBILE_NUMBER = "The mobile number you entered does not match any records. Please double-check the number and try again.";
+    const INVALID_RECEIPT_NUMBER = "The receipt number you provided does not match any records for the specified mobile number.";
+    const INVALID_STORE = "Invalid store name for the specified mobile number and receipt number.";
     const EXIST_NUMBER = "The number is already associated with another voucher.";
-
+    const RECEIPT_EXPIRED = "The claiming duration for this receipt has passed.";
 
     //SMS OPERATIONS
     const SMS_OTP_SAVE = "OTP sent successfully";

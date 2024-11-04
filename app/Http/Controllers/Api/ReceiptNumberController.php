@@ -103,7 +103,7 @@ class ReceiptNumberController extends Controller
                 $response = Http::withToken($token)->post($sms_post, [
                             'system_name' => 'Customer Service Satisfaction',
                             'message' => 'Fresh Morning! You have been selected to participate in our survey. Your receipt number is ' . $request->receipt_number . '. Please visit the CSS website to complete it.',
-                            'mobile_number' => '09168620219'
+                            'mobile_number' => $request->receipt_number,
                 ]);
             }
            

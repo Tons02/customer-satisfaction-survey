@@ -15,7 +15,7 @@ class SurveyAnswer extends Model
     use HasFactory, softDeletes, Filterable;
     
     protected $fillable = [ 
-        'entry_code',
+        'receipt_number',
         'store_id',
         'first_name',
         'middle_name',

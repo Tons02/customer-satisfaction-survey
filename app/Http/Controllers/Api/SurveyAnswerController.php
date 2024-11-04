@@ -12,7 +12,9 @@ use App\Models\FormHistory;
 use Illuminate\Support\Str;
 use App\Models\SurveyAnswer;
 use Illuminate\Http\Request;
+use App\Models\ReceiptNumber;
 use App\Models\QuestionAnswer;
+use App\Models\SurveyInterval;
 use App\Models\VoucherValidity;
 use App\Functions\GlobalFunction;
 use Illuminate\Support\Collection;
@@ -143,165 +145,224 @@ class SurveyAnswerController extends Controller
 
     }
 
-    public function checkEntryCode(RegisterCheckingRequest $request, $mobile_number, $receipt_number)
+    public function checkEntryCode(RegisterCheckingRequest $request, $mobile_number, $receipt_number, $store_id)
 {
 
     $mobile_number =  $request->mobile_number;
     $receipt_number =  $request->receipt_number;
+    $store_id =  $request->store_id;
     
-    // Fetch the latest voucher associated with the mobile number
-     $VoucherId = SurveyAnswer::withTrashed()
+    // Check if the mobile number exists
+    $receiptNumberByMobile = ReceiptNumber::where('contact_details', $mobile_number)
+    ->where('is_valid', 1)
+    ->where('is_valid', 1)
+    ->latest()
+    ->first();
+
+    if (!$receiptNumberByMobile) {
+    return GlobalFunction::response_function(
+        Message::INVALID_MOBILE_NUMBER
+    );
+    }
+
+    // Check if the receipt number exists for the provided mobile number
+    $receiptNumberByReceipt = ReceiptNumber::where('contact_details', $mobile_number)
+    ->where('receipt_number', $receipt_number)
+    ->where('is_valid', 1)
+    ->latest()
+    ->first();
+
+    if (!$receiptNumberByReceipt) {
+    return GlobalFunction::response_function(
+        Message::INVALID_RECEIPT_NUMBER,
+    );
+    }
+
+    // Check if the store ID exists for the provided mobile number and receipt number
+    $receiptNumberByStore = ReceiptNumber::where('contact_details', $mobile_number)
+    ->where('receipt_number', $receipt_number)
+    ->where('store_id', $store_id)
+    ->where('is_valid', 1)
+    ->latest()
+    ->first();
+
+    if (!$receiptNumberByStore) {
+    return GlobalFunction::response_function(
+        Message::INVALID_STORE,
+    );
+    }
+
+    // check if the valid receipt number is expired before throwing available
+    if ($receiptNumberByStore->expiration_date <= Carbon::now()) {
+        return GlobalFunction::invalid(
+            Message::RECEIPT_EXPIRED,
+        );
+    }
+
+
+    // if the receipt number is not used it will give status available to inform the user that it can take survey
+    if(!$receiptNumberByStore->is_used){
+        return GlobalFunction::response_function(
+            Message::RECEIPT_NUMBER_AVAILABLE,
+            [
+                'receipt_number' => $receipt_number,
+                'mobile_number' => $mobile_number,
+                'valid_until' => $receiptNumberByStore->expiration_date,
+                'status' => 'available'
+            ]
+        );
+    }
+    
+
+    // check if the receipt number tag survey is done if not throw the security code to continue the survey
+    if(!$receiptNumberByStore->is_done){
+        $VoucherId = SurveyAnswer::withTrashed()
+        ->where('receipt_number', $receipt_number)
         ->where('mobile_number', $mobile_number)
+        ->where('store_id', $store_id)
         ->latest()
         ->first();
 
-    // if false 
-    
-    if (!$VoucherId) {
+        $FormHistoryId = FormHistory::where('survey_id', $VoucherId->id)->first();
 
-         $check_credentials = SurveyAnswer::withTrashed()
-        ->where('first_name', $first_name)
-        ->where('last_name', $last_name)
-        ->where('birthday', $birthday)
-        ->latest()
-        ->first();
-
-        if($check_credentials && $check_credentials->next_voucher_date > Carbon::now()) {
-            return GlobalFunction::invalid(
-                Message::EXIST_CREDENTIALS,
-            );
+        if (!$FormHistoryId) {
+            return GlobalFunction::response_function(Message::NOT_FOUND, $FormHistoryId);
         }
 
-        if($check_credentials && $check_credentials->next_voucher_date === null) {
-            return GlobalFunction::invalid(
-                Message::EXIST_CREDENTIALS,
-            );
-        }
-
-        return GlobalFunction::response_function(
-            Message::ENTRY_CODE_AVAILABLE,
+        return GlobalFunction::not_found(
+            Message::ENTRY_CODE_NOT_DONE,
             [
-                'entry_code' => $entry_code,
-                'mobile_number' => $mobile_number,
-                'status' => 'available'
-            ]
-        );
-    }
-    
-    // if tapos nayung 40days nya
-    if ($VoucherId->next_voucher_date < Carbon::now() && $VoucherId->next_voucher_date != null) {
-        return GlobalFunction::response_function(
-            Message::ENTRY_CODE_AVAILABLE,
-            [
-                'entry_code' => $entry_code,
-                'mobile_number' => $mobile_number,
-                'status' => 'available'
+                'receipt_number' => $VoucherId->receipt_number,
+                'survey_id' => $VoucherId->id,
+                'security_code' => $FormHistoryId->security_code,
+                'status' => "not done"
             ]
         );
     }
 
-    // check niya lahat ng info if tama 
-    if($VoucherId->entry_code === $entry_code){
-        if($VoucherId->first_name === $first_name && $VoucherId->last_name === $last_name && $VoucherId->birthday === $birthday){
+    // check if the receipt number tag survey is done 
+    if($receiptNumberByStore->is_done){
+        $VoucherId = SurveyAnswer::
+        where('receipt_number', $receipt_number)
+        ->where('mobile_number', $mobile_number)
+        ->where('store_id', $store_id)
+        ->latest()
+        ->first();
+
+        if (!$VoucherId) {
+            return GlobalFunction::response_function(Message::NOT_FOUND, $VoucherId);
+        }  
         
-            if ($VoucherId->next_voucher_date > Carbon::now()) {
-                if ($VoucherId->valid_until < Carbon::now()) {
-                    return GlobalFunction::invalid(
-                        "You have already used your available voucher. Your next available one is on " . $VoucherId->next_voucher_date,
-                        [
-                            'voucher_code' => $VoucherId->voucher_code,
-                            'valid_until' => $VoucherId->valid_until,
-                            'claim' => $VoucherId->claim,
-                            'status' => 'voucher_expired'
-                        ]
-                    );
-                }
-
-                return GlobalFunction::invalid(
-                    "You have already used your available voucher. Your next available one is on " . $VoucherId->next_voucher_date,
-                    [
-                        'voucher_code' => $VoucherId->voucher_code,
-                        'valid_until' => $VoucherId->valid_until,
-                        'claim' => $VoucherId->claim,
-                        'status' => 'voucher_available'
-                    ]
-                );
-            }
-
-            // Check if the voucher is done or not
-            if ($VoucherId->voucher_code == null && $VoucherId->next_voucher_date < Carbon::now()) {
-                $FormHistoryId = FormHistory::where('survey_id', $VoucherId->id)->first();
-
-                if (!$FormHistoryId) {
-                    return GlobalFunction::response_function(Message::NOT_FOUND, $FormHistoryId);
-                }
-
-                return GlobalFunction::not_found(
-                    Message::ENTRY_CODE_NOT_DONE,
-                    [
-                        'entry_code' => $VoucherId->entry_code,
-                        'survey_id' => $VoucherId->id,
-                        'security_code' => $FormHistoryId->security_code,
-                        'status' => "not done"
-                    ]
-                );
-            }
-
-            return GlobalFunction::response_function(
-                Message::ENTRY_CODE_AVAILABLE,
+        if ($VoucherId->valid_until <= Carbon::now()) {
+            return GlobalFunction::invalid(
+                "You have already used your available voucher. Your next available one is on " . $VoucherId->next_voucher_date,
                 [
-                    'entry_code' => $entry_code,
-                    'mobile_number' => $mobile_number,
-                    'status' => "available"
+                    'voucher_code' => $VoucherId->voucher_code,
+                    'valid_until' => $VoucherId->valid_until,
+                    'claim' => $VoucherId->claim,
+                    'status' => 'voucher_expired'
                 ]
             );
-        }else{
-            return GlobalFunction::invalid(
-                Message::INVALID_CREDENTIALS,   
-            );
         }
-    
-    }else{
 
         return GlobalFunction::invalid(
-                Message::INVALID_RECEIPT_NUMBER,   
+            "You have already used your available voucher. Your next available one is on " . $VoucherId->next_voucher_date,
+            [
+                'voucher_code' => $VoucherId->voucher_code,
+                'valid_until' => $VoucherId->valid_until,
+                'claim' => $VoucherId->claim,
+                'status' => 'voucher_available'
+            ]
         );
-        
     }
+
 }
 
 
     public function createSurvey(SurveyAnswerRequest $request)
-    {   
-        $getNextVoucherDateByMobileNumber = SurveyAnswer::where('mobile_number', $request->input('mobile_number'))
-            ->get()
-            ->pluck(['next_voucher_date'])
-            ->first();
+    {      
+        // Check if the mobile number exists
+        $receiptNumberByMobile = ReceiptNumber::withTrashed()
+        ->where('contact_details', $request["mobile_number"])
+        ->where('is_valid', 1)
+        ->where('is_valid', 1)
+        ->latest()
+        ->first();
 
-         $getSurveyFormIfDone = SurveyAnswer::where('mobile_number', $request->input('mobile_number'))
-            ->get()
-            ->first();
+        if (!$receiptNumberByMobile) {
+        return GlobalFunction::response_function(
+            Message::INVALID_MOBILE_NUMBER
+        );
+        }
 
-        if($getNextVoucherDateByMobileNumber > Carbon::now() && $getSurveyFormIfDone->is_active == 1){
+        // Check if the receipt number exists for the provided mobile number
+        $receiptNumberByReceipt = ReceiptNumber::withTrashed()
+        ->where('contact_details', $request["mobile_number"])
+        ->where('receipt_number', $request["receipt_number"])
+        ->where('is_valid', 1)
+        ->latest()
+        ->first();
+
+        if (!$receiptNumberByReceipt) {
+        return GlobalFunction::response_function(
+            Message::INVALID_RECEIPT_NUMBER,
+        );
+        }
+
+        // Check if the store ID exists for the provided mobile number and receipt number
+        $receiptNumberByStore = ReceiptNumber::withTrashed()
+        ->where('contact_details', $request["mobile_number"])
+        ->where('receipt_number', $request["receipt_number"])
+        ->where('store_id', $request["store_id"])
+        ->where('is_valid', 1)
+        ->latest()
+        ->first();
+
+        if (!$receiptNumberByStore) {
+        return GlobalFunction::response_function(
+            Message::INVALID_STORE,
+        );
+        }
+
+        // check if the valid receipt number is expired before throwing available
+        if ($receiptNumberByStore->expiration_date <= Carbon::now()) {
+            return GlobalFunction::invalid(
+                Message::RECEIPT_EXPIRED,
+            );
+        }
+
+
+        // check if the survey is done
+        if($receiptNumberByStore->expiration_date > Carbon::now() && $receiptNumberByStore->is_done == true){
             return GlobalFunction::invalid("You have already used your available voucher. Your next available one is on ".$getNextVoucherDateByMobileNumber);
         }
-        
 
+        //prevent the creation if receipt is already used
+         // check if the survey is done
+         if($receiptNumberByStore->is_used == true){
+            return GlobalFunction::invalid("This receipt is already used");
+        }
+        
+        //get the form
         $form = Forms::get()->first();
 
+        //throws error when there is no form
         if (!$form) {
-            return GlobalFunction::invalid(Message::INVALID_ACTION);
+            return GlobalFunction::invalid(Message::SURVEY_FORM_INVALID);
         }
 
+        // delete answers that is not continue
         SurveyAnswer::where('mobile_number', $request->input('mobile_number'))
         ->where('is_active', 0)
         ->forceDelete();
 
+        //delete history that is not continue
         FormHistory::where('mobile_number', $request->input('mobile_number'))
         ->forceDelete();
 
+        //create the survey
      $CreateSurveyAnswer = SurveyAnswer::create([
-            "entry_code" => $request["entry_code"],
+            "receipt_number" => $request["receipt_number"],
             "store_id" => $request["store_id"],
             "first_name" => $request["first_name"],
             "middle_name" => $request["middle_name"],
@@ -318,6 +379,7 @@ class SurveyAnswerController extends Controller
         $softdelete = SurveyAnswer::where('id', $CreateSurveyAnswer->id)
         ->Delete();
 
+        //create a history of taking survey answers
         $FormHistory = FormHistory::create([
             "survey_id" => $CreateSurveyAnswer->id,
             "security_code" => $validUntil = Carbon::now()->format('YmdHis'),
@@ -325,6 +387,11 @@ class SurveyAnswerController extends Controller
             "title" => $form->title,
             "description" => $form->description,
             "sections" => $form->sections,
+        ]);
+
+        // update the status of receipt number that this receipt is used on survey
+        $receiptNumberByStore->update([
+            "is_used" => 1,
         ]);
 
         $responseData = $FormHistory->toArray();
@@ -336,11 +403,11 @@ class SurveyAnswerController extends Controller
 
     public function updateSurveyAnswer(Request $request, $id){
 
-         $request->input('questionnaire_answer');
+        $request->input('questionnaire_answer');
 
         $SurveyAnswerId = SurveyAnswer::
         withTrashed()
-       ->where('id', $id)
+        ->where('id', $id)
         ->first();
 
         $FormHistoryId = FormHistory::where('survey_id', $id)
@@ -354,15 +421,23 @@ class SurveyAnswerController extends Controller
             return GlobalFunction::not_found(Message::SURVEY_ANSWER_ALREADY_DONE);
         }
 
-        if (!$duration = VoucherValidity::get()[0]['duration']) {
-            return GlobalFunction::response_function(Message::INVALID_ACTION);
+        $duration = VoucherValidity::latest()
+        ->first();
+
+        if (!$duration) {
+            return GlobalFunction::response_function(Message::SURVEY_VALIDITY_INVALID);
         }
         
         $validUntil = Carbon::now()->addDays($duration);
         
-        $voucherCode = substr(str_replace('-', '', Str::uuid()), 0, 6) . $validUntil->format('YmdHis');        
+        $voucherCode = substr(str_replace('-', '', Str::uuid()), 0, 4) . $validUntil->format('YmdHis');        
 
-        
+        $surveyInterval = SurveyInterval::latest()
+        ->first();
+
+        if (!$surveyInterval) {
+            return GlobalFunction::response_function(Message::SURVEY_INTERVAL_INVALID);
+        }
 
         $SurveyAnswerId->restore();
 
@@ -370,7 +445,7 @@ class SurveyAnswerController extends Controller
             "questionnaire_answer" => $request->input('questionnaire_answer'),
             "voucher_code" => $voucherCode,
             "valid_until" => $validUntil,
-            "next_voucher_date" => Carbon::now()->addDays(90),
+            "next_voucher_date" => Carbon::now()->addDays($surveyInterval->days),
             "claim" => "not_yet",
             "is_active" => 1,
             "submit_date" => Carbon::now(),
@@ -381,51 +456,64 @@ class SurveyAnswerController extends Controller
 
         $questionnaire_answers = $request->input('questionnaire_answer');
 
-    // Loop through each section
-    foreach ($questionnaire_answers as $questionnaire_answer) {
-        // Loop through each question within the section
-        foreach ($questionnaire_answer['questions'] as $question) {
-            // Handle grid type questions separately
-            if ($question['questionType'] === 'grid') {
-                foreach ($question['answer'] as $gridAnswer) {
-                    if ($gridAnswer['rowAnswer'] === "") {
-                        continue; // Skip if the answer is empty
+        // Loop through each section
+        foreach ($questionnaire_answers as $questionnaire_answer) {
+            // Loop through each question within the section
+            foreach ($questionnaire_answer['questions'] as $question) {
+                // Handle grid type questions separately
+                if ($question['questionType'] === 'grid') {
+                    foreach ($question['answer'] as $gridAnswer) {
+                        if ($gridAnswer['rowAnswer'] === "") {
+                            continue; // Skip if the answer is empty
+                        }
+
+                        $finalAnswer = $gridAnswer['rowAnswer'] === "Other" 
+                            ? (is_array($gridAnswer['otherAnswer']) ? implode(', ', $gridAnswer['otherAnswer']) : $gridAnswer['otherAnswer']) 
+                            : $gridAnswer['rowAnswer'];
+
+                        QuestionAnswer::create([
+                            'survey_id' => $id,
+                            'question_type' => $question['questionType'],
+                            'question' => $question['questionName'] . ' - ' . $gridAnswer['rowQuestion'],
+                            'answer' => $finalAnswer,
+                        ]);
                     }
+                } else {
+                    $answers = is_array($question['answer']) ? $question['answer'] : [$question['answer']];
+                    
+                    foreach ($answers as $answer) {
+                        if ($answer === "") {
+                            continue; // Skip if the answer is empty
+                        }
 
-                    $finalAnswer = $gridAnswer['rowAnswer'] === "Other" 
-                        ? (is_array($gridAnswer['otherAnswer']) ? implode(', ', $gridAnswer['otherAnswer']) : $gridAnswer['otherAnswer']) 
-                        : $gridAnswer['rowAnswer'];
+                        $finalAnswer = $answer === "Other" 
+                            ? (is_array($question['otherAnswer']) ? implode(', ', $question['otherAnswer']) : $question['otherAnswer']) 
+                            : $answer;
 
-                    QuestionAnswer::create([
-                        'survey_id' => $id,
-                        'question_type' => $question['questionType'],
-                        'question' => $question['questionName'] . ' - ' . $gridAnswer['rowQuestion'],
-                        'answer' => $finalAnswer,
-                    ]);
-                }
-            } else {
-                $answers = is_array($question['answer']) ? $question['answer'] : [$question['answer']];
-                
-                foreach ($answers as $answer) {
-                    if ($answer === "") {
-                        continue; // Skip if the answer is empty
+                        QuestionAnswer::create([
+                            'survey_id' => $id,
+                            'question_type' => $question['questionType'],
+                            'question' => $question['questionName'],
+                            'answer' => $finalAnswer,
+                        ]);
                     }
-
-                    $finalAnswer = $answer === "Other" 
-                        ? (is_array($question['otherAnswer']) ? implode(', ', $question['otherAnswer']) : $question['otherAnswer']) 
-                        : $answer;
-
-                    QuestionAnswer::create([
-                        'survey_id' => $id,
-                        'question_type' => $question['questionType'],
-                        'question' => $question['questionName'],
-                        'answer' => $finalAnswer,
-                    ]);
                 }
             }
         }
-    }
 
+        //update the status of receipt to done
+        $receiptNumber = ReceiptNumber::
+        where('contact_details', $SurveyAnswerId->mobile_number)
+        ->where('receipt_number', $SurveyAnswerId->receipt_number)
+        ->where('is_valid', 1)
+        ->latest()
+        ->first();
+
+        $receiptNumber->update([
+            "is_done" => 1,
+        ]);
+
+        // delete the history of survey 
         FormHistory::where('mobile_number', $SurveyAnswerId->mobile_number)
         ->forceDelete();
 
