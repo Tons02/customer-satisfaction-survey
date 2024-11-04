@@ -11,7 +11,7 @@ use App\Http\Requests\SurveyPeriodRequest;
 
 class SurveyPeriodController extends Controller
 {
-    public function getSurveyInterval(Request $request){
+    public function index(Request $request){
         $status = $request->query('status');
         
         $SurveyPeriod = SurveyPeriod::

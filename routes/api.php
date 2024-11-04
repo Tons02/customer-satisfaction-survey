@@ -62,7 +62,7 @@ Route::get("province-name-public-api", [ProvinceController::class, 'getAllProvin
 Route::get("store-name-public-api", [StoreNameController::class, 'getAllStoreNames']);
 
 // public api of survey interval 
-Route::get("survey-interval-public-api", [SurveyPeriodController::class, 'getSurveyInterval']);
+// Route::get("survey-interval-public-api", [SurveyPeriodController::class, 'getSurveyInterval']);
 
 Route::group(["middleware" => ["auth:sanctum"]], function () {
 
