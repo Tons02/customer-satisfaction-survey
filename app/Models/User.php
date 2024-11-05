@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Role;
+use App\Models\Province;
+use App\Models\StoreName;
 use App\Filters\UserFilters;
 use Laravel\Sanctum\HasApiTokens;
 use Essa\APIToolKit\Filters\Filterable;
@@ -41,6 +43,8 @@ class User extends Authenticatable
         'sub_unit', 
         'location_id',
         'location',
+        'province_id',
+        'store_id',
         'username', 
         'password',
         'role_id',
@@ -74,6 +78,16 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(Role::class, 'role_id')->withTrashed();
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class, 'role_id')->withTrashed();
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(StoreName::class, 'store_id')->withTrashed();
     }
 
 }

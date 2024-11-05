@@ -41,6 +41,15 @@ class UserResource extends JsonResource
 
             'location_id' => $this->location_id,
             'location' => $this->location,
+            'province' => $this->province ? [
+                'id' => $this->province->id,
+                'name' => $this->province->name
+            ] : null,
+            'store' => $this->store ? [
+                'id' => $this->store->id,
+                'name' => $this->store->name
+            ] : null,
+
 
             'username' => $this->username,
             'role' => [

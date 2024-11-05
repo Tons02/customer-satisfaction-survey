@@ -26,6 +26,8 @@ return new class extends Migration
             $table->string('unit');
             $table->string('sub_unit');
             $table->string('location');
+            $table->unsignedInteger("province_id")->index();
+            $table->unsignedInteger("store_id")->index();
             $table->string('username')->unique();
             $table->string('password');
             $table->unsignedInteger("role_id")->index();

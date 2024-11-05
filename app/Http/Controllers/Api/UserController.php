@@ -40,7 +40,6 @@ class UserController extends Controller
     public function store(UserRequest $request){
         
         $this->authorize('create', User::class);
-
         $create_user = User::create([
             "id_prefix" => $request["personal_info"]["id_prefix"],
             "id_no" => $request["personal_info"]["id_no"],
@@ -67,6 +66,9 @@ class UserController extends Controller
             
             "location_id" => $request["personal_info"]["location_id"],
             "location" => $request["personal_info"]["location"],
+
+            "province_id" => $request["personal_info"]["province_id"],
+            "store_id" => $request["personal_info"]["store_id"],
 
             "username" => $request["username"],
             "password" => $request["username"],
@@ -111,6 +113,10 @@ class UserController extends Controller
         
         $userID->location_id = $request["personal_info"]["location_id"];
         $userID->location = $request["personal_info"]["location"];
+
+        
+        $userID->province_id = $request["personal_info"]["province_id"];
+        $userID->store_id = $request["personal_info"]["store_id"];
 
         if (!$userID->isDirty()) {
             return GlobalFunction::response_function(Message::NO_CHANGES);
