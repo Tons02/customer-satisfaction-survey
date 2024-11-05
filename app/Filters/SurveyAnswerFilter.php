@@ -18,7 +18,7 @@ class SurveyAnswerFilter extends QueryFilters
 
     protected array $columnSearch = [
         "id",
-        "entry_code",
+        "receipt_number",
         "first_name",
         "middle_name",
         "last_name",

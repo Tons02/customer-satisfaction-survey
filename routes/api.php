@@ -113,6 +113,7 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
 
     //Receipt Number Controller
     Route::resource("receipt-number", ReceiptNumberController::class);
+    Route::put('receipt-number-archived/{id}',[ReceiptNumberController::class,'archived']);
 
     //Survey Interval Controller
     Route::resource("survey-interval", SurveyIntervalController::class);

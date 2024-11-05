@@ -47,13 +47,14 @@ class ReceiptNumberController extends Controller
         $storeId = $request->store_id;
 
         // Count the total receipt numbers for the given store_id
-        $count = ReceiptNumber::where('store_id', $storeId)->count();
+        $count = ReceiptNumber::withTrashed()->where('store_id', $storeId)->count();
 
         // Get the limit and trigger point from the TriggerSetup model
         $triggerSetup = TriggerSetUp::first();
         if (!$triggerSetup) {
             return GlobalFunction::not_found(Message::TRIGGER_INVALID);
         }
+        
         $limit = $triggerSetup->limit; 
         $trigger_point = $triggerSetup->trigger_point; 
 
@@ -136,5 +137,39 @@ class ReceiptNumberController extends Controller
         
         return GlobalFunction::response_function(Message::RECEIPT_NUMBER_UPDATE);
     }
+
+    public function archived(Request $request, $id)
+    {
+        $receiptNumber = ReceiptNumber::withTrashed()->find($id);
+        // return $role
+        if (!$receiptNumber) {
+            return GlobalFunction::not_found(Message::NOT_FOUND);
+        }
+        
+        if ($receiptNumber->deleted_at) {
+
+            $receiptNumber->update([
+                'is_active' => 1
+            ]);
+            $receiptNumber->restore();
+            return GlobalFunction::response_function(Message::RESTORE_STATUS);
+        }
+
+        if (ReceiptNumber::where('id', $id)->where('is_used', 1)->exists()) {
+            return GlobalFunction::invalid(Message::RECEIPT_NUMBER_ALREADY_USED);
+        }        
+
+        if (!$receiptNumber->deleted_at) {
+
+            $receiptNumber->update([
+                'is_active' => 0
+            ]);
+            $receiptNumber->delete();
+            return GlobalFunction::response_function(Message::ARCHIVE_STATUS);
+
+        } 
+    }
+
+
 
 }

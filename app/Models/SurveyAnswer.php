@@ -31,6 +31,7 @@ class SurveyAnswer extends Model
         'next_voucher_date',
         'claim',
         'claim_by_user_id',
+        'claimed_date',
         'submit_date',
         'is_active',
     ];

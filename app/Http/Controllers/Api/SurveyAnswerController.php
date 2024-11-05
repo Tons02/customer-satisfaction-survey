@@ -55,7 +55,7 @@ class SurveyAnswerController extends Controller
             $query->whereBetween('submit_date', [$from_date, $to_date]);
         })     
         ->when($reports === 'claimed_date', function($query) use ($from_date, $to_date) {
-            $query->whereBetween('updated_at', [$from_date, $to_date])
+            $query->whereBetween('claimed_date', [$from_date, $to_date])
                   ->whereNotNull('claim_by_user_id');
         })      
         ->when(!empty($voucher_code), function($query) use ($voucher_code) {
@@ -282,8 +282,8 @@ class SurveyAnswerController extends Controller
     public function createSurvey(SurveyAnswerRequest $request)
     {      
         // Check if the mobile number exists
-        $receiptNumberByMobile = ReceiptNumber::withTrashed()
-        ->where('contact_details', $request["mobile_number"])
+        $receiptNumberByMobile = ReceiptNumber::
+        where('contact_details', $request["mobile_number"])
         ->where('is_valid', 1)
         ->where('is_valid', 1)
         ->latest()
@@ -296,8 +296,8 @@ class SurveyAnswerController extends Controller
         }
 
         // Check if the receipt number exists for the provided mobile number
-        $receiptNumberByReceipt = ReceiptNumber::withTrashed()
-        ->where('contact_details', $request["mobile_number"])
+        $receiptNumberByReceipt = ReceiptNumber::
+        where('contact_details', $request["mobile_number"])
         ->where('receipt_number', $request["receipt_number"])
         ->where('is_valid', 1)
         ->latest()
@@ -310,8 +310,8 @@ class SurveyAnswerController extends Controller
         }
 
         // Check if the store ID exists for the provided mobile number and receipt number
-        $receiptNumberByStore = ReceiptNumber::withTrashed()
-        ->where('contact_details', $request["mobile_number"])
+        $receiptNumberByStore = ReceiptNumber::
+        where('contact_details', $request["mobile_number"])
         ->where('receipt_number', $request["receipt_number"])
         ->where('store_id', $request["store_id"])
         ->where('is_valid', 1)
@@ -549,6 +549,7 @@ class SurveyAnswerController extends Controller
         $SurveyAnswerId->update([
             "claim" => "claimed",
             "claim_by_user_id" => auth('sanctum')->user()->id, 
+            "claimed_date" => Carbon::now()
         ]);
         
         return GlobalFunction::response_function(Message::VOUCHER_CLAIM_SUCCESSFULLY, 
@@ -556,6 +557,7 @@ class SurveyAnswerController extends Controller
             "voucher_code" => $SurveyAnswerId->voucher_code,
             "claim" => $SurveyAnswerId->claim,
             "claim_by_user_id" => auth('sanctum')->user()->id, 
+            "claimed_date" => Carbon::now()
         ]);
     }
 

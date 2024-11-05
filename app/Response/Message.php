@@ -60,6 +60,7 @@ class Message
     const SURVEY_VALIDITY_INVALID = "No Survey duration has been set. Please contact the administrator.";
     const ENTRY_CODE_NOT_DONE = "Survey Answer not done";
     const RECEIPT_NUMBER_AVAILABLE = "Receipt available";
+    const RECEIPT_NUMBER_ALREADY_USED = "Receipt already used";
     const RECEIPT_NUMBER_NOT_DONE = "Survey Answer not done";
     const RECEIPT_NUMBER_ALREADY_CLAIMED = "Entry code already claimed";
     const INVALID_CREDENTIALS = "Invalid credentials for this number";

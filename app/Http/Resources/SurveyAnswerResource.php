@@ -16,7 +16,7 @@ class SurveyAnswerResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'entry_code' => $this->entry_code,
+            'entry_code' => $this->receipt_number,
             'store' => [
                 'id' => $this->store->id,
                 'name' => $this->store->name
@@ -46,8 +46,7 @@ class SurveyAnswerResource extends JsonResource
             'questionnaire_answer' => $this->questionnaire_answer,
             'is_active' => $this->is_active,
             'submit_date' => $this->submit_date,
-            'claim_date' => ($this->claim == 'not_yet' || $this->claim == 'expired') ? 'unprocessed' : $this->updated_at,
-            // 'claim_date' => $this->claim == 'not_yet' ? 'unprocessed' : $this->updated_at,
+            'claim_date' => ($this->claim == 'not_yet' || $this->claim == 'expired') ? 'unprocessed' : $this->claimed_date,
         ];
     }
 }
