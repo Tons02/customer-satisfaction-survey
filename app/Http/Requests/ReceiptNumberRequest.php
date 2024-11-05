@@ -43,8 +43,7 @@ class ReceiptNumberRequest extends FormRequest
             Rule::unique('receipt_numbers')->where(function ($query) {
                 return $query->where('is_valid', true); // Only check unique for valid entries
             })->ignore($this->route('receipt_number')),
-        ],
-            "store_id" => ["required", "exists:store_names,id"],
+        ]
         ];
         
     }

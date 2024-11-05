@@ -91,7 +91,7 @@ class ReceiptNumberController extends Controller
             $create_role = ReceiptNumber::create([
                 "receipt_number" => $request->receipt_number,
                 "contact_details" => $request->contact_details,
-                "store_id" => $request->store_id,
+                "store_id" => auth('sanctum')->user()->store_id,
                 "expiration_date" => $expiryDate,
                 "is_valid" => $isValid
             ]);
@@ -119,6 +119,10 @@ class ReceiptNumberController extends Controller
 
     public function update(ReceiptNumberRequest $request, $id)
     {   
+        if (ReceiptNumber::where('id', $id)->where('is_used', 1)->exists()) {
+            return GlobalFunction::invalid(Message::RECEIPT_NUMBER_ALREADY_USED);
+        }        
+        
         $receipt = ReceiptNumber::find($id);
 
         if (!$receipt) {
@@ -127,7 +131,6 @@ class ReceiptNumberController extends Controller
 
         $receipt->receipt_number = $request['receipt_number'];
         $receipt->contact_details = $request['contact_details'];
-        $receipt->store_id = $request['store_id'];
 
         if (!$receipt->isDirty()) {
             return GlobalFunction::response_function(Message::NO_CHANGES);
