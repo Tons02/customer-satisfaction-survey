@@ -121,6 +121,7 @@ class Message
      const SURVEY_PERIOD_UPDATE = "Survey period successfully updated.";
      const SURVEY_PERIOD_DISPLAY = "Survey period display successfully.";
      const SURVEY_PERIOD_ALREADY_USE = "Unable to Archive, Survey period already in used!";
+     const SURVEY_PERIOD_ALREADY_CLOSED = "Survey period already closed";
 
     //CHART MESSAGE
     const CHART_FOR_AGE = "Chart data display successfully.";

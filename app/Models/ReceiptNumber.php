@@ -34,4 +34,11 @@ class ReceiptNumber extends Model
         'is_active' => 'boolean',
         'is_done' => 'boolean'
     ];
+
+    public function store()
+    {
+        return $this->belongsTo(StoreName::class, 'store_id')->withTrashed();
+    }
+
+
 }

@@ -82,7 +82,7 @@ class User extends Authenticatable
 
     public function province()
     {
-        return $this->belongsTo(Province::class, 'role_id')->withTrashed();
+        return $this->belongsTo(Province::class, 'province_id')->withTrashed();
     }
 
     public function store()

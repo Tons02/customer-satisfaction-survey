@@ -16,7 +16,7 @@ class SurveyAnswerResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'entry_code' => $this->receipt_number,
+            'receipt_number' => $this->receipt_number,
             'store' => [
                 'id' => $this->store->id,
                 'name' => $this->store->name
@@ -36,13 +36,9 @@ class SurveyAnswerResource extends JsonResource
             'claim_by' => $this->user ? [
                 'id' => $this->user->id,
                 'name' => $this->user->first_name . ' ' . $this->user->last_name,
-                'company' => $this->user->company,
-                'business_unit' => $this->user->business_unit,
-                'department' => $this->user->department,
-                'unit' => $this->user->unit,
-                'sub_unit' => $this->user->sub_unit,
-                'location' => $this->user->location,
-            ] : 'unprocessed',                   
+                'province' => $this->user->province->name,
+                'store' => $this->user->store->name,
+            ] : 'unprocessed',
             'questionnaire_answer' => $this->questionnaire_answer,
             'is_active' => $this->is_active,
             'submit_date' => $this->submit_date,

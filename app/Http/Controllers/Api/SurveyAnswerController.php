@@ -11,6 +11,7 @@ use App\Response\Message;
 use App\Models\FormHistory;
 use Illuminate\Support\Str;
 use App\Models\SurveyAnswer;
+use App\Models\SurveyPeriod;
 use Illuminate\Http\Request;
 use App\Models\ReceiptNumber;
 use App\Models\QuestionAnswer;
@@ -148,6 +149,20 @@ class SurveyAnswerController extends Controller
     public function checkEntryCode(RegisterCheckingRequest $request, $mobile_number, $receipt_number, $store_id)
 {
 
+    //add validation for survey period
+    $SurveyPeriod = SurveyPeriod::latest()
+    ->first();
+
+    if (!$SurveyPeriod) {
+        return GlobalFunction::response_function(Message::SURVEY_PERIOD_INVALID);
+    }
+    // return $SurveyPeriod->valid_to;
+
+    if ($SurveyPeriod->valid_from <= Carbon::now() && Carbon::now() >= $SurveyPeriod->valid_to ) {
+        // i want here that valid_from is less than the day today and the valid_to is less than today it will go thgis
+        return GlobalFunction::response_function(Message::SURVEY_PERIOD_ALREADY_CLOSED);
+    }         
+
     $mobile_number =  $request->mobile_number;
     $receipt_number =  $request->receipt_number;
     $store_id =  $request->store_id;
@@ -280,7 +295,20 @@ class SurveyAnswerController extends Controller
 
 
     public function createSurvey(SurveyAnswerRequest $request)
-    {      
+    {       
+        $SurveyPeriod = SurveyPeriod::latest()
+        ->first();
+
+        if (!$SurveyPeriod) {
+            return GlobalFunction::response_function(Message::SURVEY_PERIOD_INVALID);
+        }
+        // return $SurveyPeriod->valid_to;
+
+        if ($SurveyPeriod->valid_from <= Carbon::now() && Carbon::now() >= $SurveyPeriod->valid_to ) {
+            // i want here that valid_from is less than the day today and the valid_to is less than today it will go thgis
+            return GlobalFunction::response_function(Message::SURVEY_PERIOD_ALREADY_CLOSED);
+        }         
+
         // Check if the mobile number exists
         $receiptNumberByMobile = ReceiptNumber::
         where('contact_details', $request["mobile_number"])
@@ -402,6 +430,20 @@ class SurveyAnswerController extends Controller
     }
 
     public function updateSurveyAnswer(Request $request, $id){
+
+        //add validation for survey period
+        $SurveyPeriod = SurveyPeriod::latest()
+        ->first();
+
+        if (!$SurveyPeriod) {
+            return GlobalFunction::response_function(Message::SURVEY_PERIOD_INVALID);
+        }
+        // return $SurveyPeriod->valid_to;
+
+        if ($SurveyPeriod->valid_from <= Carbon::now() && Carbon::now() >= $SurveyPeriod->valid_to ) {
+            // i want here that valid_from is less than the day today and the valid_to is less than today it will go thgis
+            return GlobalFunction::response_function(Message::SURVEY_PERIOD_ALREADY_CLOSED);
+        }         
 
         $request->input('questionnaire_answer');
 
@@ -642,7 +684,24 @@ class SurveyAnswerController extends Controller
                         // If all stores are selected, group by claim only
                         $query->groupBy('claim');
                     });
-            })            
+            })      
+            ->when($data === 'line-chart', function ($query) use ($from_date, $to_date, $store) {
+                $query->with('store')
+                    ->select(
+                        DB::raw("DATE_FORMAT(submit_date, '%Y-%m') as month"),
+                        DB::raw('COUNT(*) as total_respondent'),
+                        DB::raw("SUM(CASE WHEN claim = 'claimed' THEN 1 ELSE 0 END) as total_claimed"),
+                        DB::raw("SUM(CASE WHEN claim = 'not_yet' THEN 1 ELSE 0 END) as total_not_claimed"),
+                        DB::raw("SUM(CASE WHEN claim = 'expired' THEN 1 ELSE 0 END) as total_expired")
+                    )
+                    ->whereBetween('submit_date', [$from_date, $to_date])
+                    ->when(!is_null($store), function ($query) use ($store) {
+                        $query->where('store_id', $store)
+                              ->groupBy('month', 'store_id');
+                    }, function ($query) {
+                        $query->groupBy('month'); // Group by month only when "All store" is selected
+                    });
+            })                      
             ->useFilters()
             ->dynamicPaginate();
     
@@ -654,22 +713,33 @@ class SurveyAnswerController extends Controller
     
         // Check if $store is null, then set all stores under "All store"
         if (is_null($store)) {
-            $ChartData = collect([[
-                'store' => 'All store',
-                'data' => $ChartData->map(function ($item) use ($data) {
-                    if ($data === 'gender') {
-                        return [
-                            'gender' => $item->gender,
-                            'total' => $item->total,
-                        ];
-                    } elseif ($data === 'age') {
-                        return [
-                            'age' => $item->age,
-                            'total' => $item->total,
-                        ];
-                    }
-                })->values()
-            ]]);
+            $ChartData = collect([
+                [
+                    'store' => 'All store',
+                    'data' => $ChartData->map(function ($item) use ($data) {
+                        if ($data === 'gender') {
+                            return [
+                                'gender' => $item->gender,
+                                'total' => $item->total,
+                            ];
+                        } elseif ($data === 'age') {
+                            return [
+                                'age' => $item->age,
+                                'total' => $item->total,
+                            ];
+                        } elseif ($data === 'line-chart') {
+                            return [
+                                $item->month => [
+                                    'total_respondent' => $item->total_respondent,
+                                    'total_claimed' => $item->total_claimed,
+                                    'total_not_claimed' => $item->total_not_claimed,
+                                    'total_expired' => $item->total_expired,
+                                ]
+                            ];
+                        }
+                    })->values()
+                ]
+            ]);
         } else {
             // When a specific store is selected, group by store name
             $ChartData = $ChartData->groupBy('store.name')->map(function (Collection $items, $storeName) use ($data) {
@@ -686,11 +756,20 @@ class SurveyAnswerController extends Controller
                                 'age' => $item->age,
                                 'total' => $item->total,
                             ];
+                        } elseif ($data === 'line-chart') {
+                            return [
+                                $item->month => [
+                                    'total_respondent' => $item->total_respondent,
+                                    'total_claimed' => $item->total_claimed,
+                                    'total_expired' => $item->total_expired,
+                                ]
+                            ];
                         }
                     })->values()
                 ];
             })->values();
         }
+
     
         return GlobalFunction::response_function(Message::CHART_FOR_AGE, $ChartData);
     }

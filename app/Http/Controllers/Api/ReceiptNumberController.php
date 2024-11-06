@@ -44,7 +44,7 @@ class ReceiptNumberController extends Controller
 
     public function store(ReceiptNumberRequest $request)
     {      
-        $storeId = $request->store_id;
+        $storeId = auth('sanctum')->user()->store_id;
 
         // Count the total receipt numbers for the given store_id
         $count = ReceiptNumber::withTrashed()->where('store_id', $storeId)->count();
@@ -98,14 +98,14 @@ class ReceiptNumberController extends Controller
     
             if($isValid){
                 // Send sms when the reciept number is valid
-                $token = env('SMS_TOKEN');
-                $sms_post = env('SMS_POST');
+                // $token = env('SMS_TOKEN');
+                // $sms_post = env('SMS_POST');
     
-                $response = Http::withToken($token)->post($sms_post, [
-                            'system_name' => 'Customer Service Satisfaction',
-                            'message' => 'Fresh Morning! You have been selected to participate in our survey. Your receipt number is ' . $request->receipt_number . '. Please visit the CSS website to complete it.',
-                            'mobile_number' => $request->receipt_number,
-                ]);
+                // $response = Http::withToken($token)->post($sms_post, [
+                //             'system_name' => 'Customer Service Satisfaction',
+                //             'message' => 'Fresh Morning! You have been selected to participate in our survey. Your receipt number is ' . $request->receipt_number . '. Please visit the CSS website to complete it.',
+                //             'mobile_number' => $request->receipt_number,
+                // ]);
             }
            
             return GlobalFunction::response_function(Message::RECEIPT_NUMBER_SAVE);
@@ -122,7 +122,7 @@ class ReceiptNumberController extends Controller
         if (ReceiptNumber::where('id', $id)->where('is_used', 1)->exists()) {
             return GlobalFunction::invalid(Message::RECEIPT_NUMBER_ALREADY_USED);
         }        
-        
+
         $receipt = ReceiptNumber::find($id);
 
         if (!$receipt) {

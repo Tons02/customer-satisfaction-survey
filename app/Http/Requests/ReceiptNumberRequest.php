@@ -28,8 +28,8 @@ class ReceiptNumberRequest extends FormRequest
                 "required",
                 "string",
                 $this->route('receipt_number')
-                    ? "unique:receipt_numbers,receipt_number," . $this->route('receipt_number') . ",id,store_id," . $this->input('store_id')
-                    : "unique:receipt_numbers,receipt_number,NULL,id,store_id," . $this->input('store_id'),
+                    ? "unique:receipt_numbers,receipt_number," . $this->route('receipt_number') . ",id,store_id," . auth('sanctum')->user()->store_id
+                    : "unique:receipt_numbers,receipt_number,NULL,id,store_id," . auth('sanctum')->user()->store_id,
             ],
         // validation for all number
         //    "contact_details" => [ 

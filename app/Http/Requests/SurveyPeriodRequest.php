@@ -22,14 +22,16 @@ class SurveyPeriodRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'valid_from' => [
-                'required',
-                'date',
-            ],
-            'valid_to' => [
-                'required',
-                'date',
-            ],
+        'valid_from' => [
+            'required',
+            'date',
+        ],
+        'valid_to' => [
+            'required',
+            'date',
+            'after_or_equal:valid_from', // ensures valid_to is not before valid_from
+        ],
+
         ];
     }
 }

@@ -49,8 +49,6 @@ class UserResource extends JsonResource
                 'id' => $this->store->id,
                 'name' => $this->store->name
             ] : null,
-
-
             'username' => $this->username,
             'role' => [
                 'id' => $this->role->id,
