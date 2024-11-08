@@ -647,8 +647,12 @@ class SurveyAnswerController extends Controller
         $status = $request->query('status');
         $store = $request->query('store');
         $from_date = $request->query('from_date') ?? '2023-06-11';
-        $to_date = $request->query('to_date') ?? '2055-06-11';
-    
+        $to_date = $request->query('to_date') ?? Carbon::now();
+        $year = $request->query('year') ?? Carbon::now()->year;
+         $startyear = Carbon::createFromDate($year)->startOfYear();  // Start of the specified year
+         $endyear = Carbon::createFromDate($year)->endOfYear();  // End of the specified year
+
+
         $ChartData = SurveyAnswer::
             when($status === "inactive", function ($query) {
                 $query->onlyTrashed();
@@ -672,20 +676,8 @@ class SurveyAnswerController extends Controller
                         $query->groupBy('age'); // Do not group by store_id when "All store" is selected
                     })
                     ->whereBetween('submit_date', [$from_date, $to_date]);
-            })
-            ->when($data === 'claimed', function($query) use ($from_date, $to_date, $store) {
-                $query->with('store')
-                    ->select(DB::raw("'claim' = 'claimed'"), DB::raw('count(*) as total'))
-                    ->whereBetween('submit_date', [$from_date, $to_date])
-                    ->when(!is_null($store), function($query) {
-                        // If a specific store is selected, group by store_id
-                        $query->addSelect('store_id')->groupBy('claim', 'store_id');
-                    }, function($query) {
-                        // If all stores are selected, group by claim only
-                        $query->groupBy('claim');
-                    });
-            })      
-            ->when($data === 'line-chart', function ($query) use ($from_date, $to_date, $store) {
+            })  
+            ->when($data === 'line-chart', function ($query) use ($startyear, $endyear, $store) {
                 $query->with('store')
                     ->select(
                         DB::raw("DATE_FORMAT(submit_date, '%Y-%m') as month"),
@@ -694,10 +686,9 @@ class SurveyAnswerController extends Controller
                         DB::raw("SUM(CASE WHEN claim = 'not_yet' THEN 1 ELSE 0 END) as total_not_claimed"),
                         DB::raw("SUM(CASE WHEN claim = 'expired' THEN 1 ELSE 0 END) as total_expired")
                     )
-                    ->whereBetween('submit_date', [$from_date, $to_date])
+                    ->whereBetween('submit_date', [$startyear, $endyear])
                     ->when(!is_null($store), function ($query) use ($store) {
-                        $query->where('store_id', $store)
-                              ->groupBy('month', 'store_id');
+                        $query->addSelect('store_id')->groupBy('month', 'store_id');
                     }, function ($query) {
                         $query->groupBy('month'); // Group by month only when "All store" is selected
                     });
@@ -730,10 +721,10 @@ class SurveyAnswerController extends Controller
                         } elseif ($data === 'line-chart') {
                             return [
                                 $item->month => [
-                                    'total_respondent' => $item->total_respondent,
-                                    'total_claimed' => $item->total_claimed,
-                                    'total_not_claimed' => $item->total_not_claimed,
-                                    'total_expired' => $item->total_expired,
+                                    'total_respondent' => (int) $item->total_respondent,
+                                    'total_claimed' => (int) $item->total_claimed,
+                                    'total_not_claimed' => (int) $item->total_not_claimed,
+                                    'total_expired' => (int) $item->total_expired,
                                 ]
                             ];
                         }
@@ -759,9 +750,10 @@ class SurveyAnswerController extends Controller
                         } elseif ($data === 'line-chart') {
                             return [
                                 $item->month => [
-                                    'total_respondent' => $item->total_respondent,
-                                    'total_claimed' => $item->total_claimed,
-                                    'total_expired' => $item->total_expired,
+                                    'total_respondent' => (int) $item->total_respondent,
+                                    'total_claimed' => (int) $item->total_claimed,
+                                    'total_not_claimed' => (int) $item->total_not_claimed,
+                                    'total_expired' => (int) $item->total_expired,
                                 ]
                             ];
                         }

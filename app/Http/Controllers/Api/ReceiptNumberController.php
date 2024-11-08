@@ -47,7 +47,9 @@ class ReceiptNumberController extends Controller
         $storeId = auth('sanctum')->user()->store_id;
 
         // Count the total receipt numbers for the given store_id
-        $count = ReceiptNumber::withTrashed()->where('store_id', $storeId)->count();
+        return $count = ReceiptNumber::withTrashed()->where('store_id', $storeId)
+                ->whereDate('created_at', Carbon::today())
+                ->count();;
 
         // Get the limit and trigger point from the TriggerSetup model
         $triggerSetup = TriggerSetUp::first();
