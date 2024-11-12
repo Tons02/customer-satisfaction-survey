@@ -31,4 +31,18 @@ class ReceiptNumberFilters extends QueryFilters
 
         return $this; 
     }
+
+
+    public function is_valid($is_valid)
+    {
+        if ($is_valid !== null && is_string($is_valid) && $is_valid !== '') {
+            // Convert the comma-separated string into an array
+            $is_validArray = explode(',', $is_valid);
+            
+            // Use whereIn to filter results based on the array
+            $this->builder->whereIn('is_valid', $is_validArray);
+        }
+
+        return $this; 
+    }
 }

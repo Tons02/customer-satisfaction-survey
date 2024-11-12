@@ -46,8 +46,8 @@ class ReceiptNumberController extends Controller
     {      
         $storeId = auth('sanctum')->user()->store_id;
 
-        // Count the total receipt numbers for the given store_id
-        return $count = ReceiptNumber::withTrashed()->where('store_id', $storeId)
+        // Count the total receipt numbers for the given store_id per day
+        $count = ReceiptNumber::withTrashed()->where('store_id', $storeId)
                 ->whereDate('created_at', Carbon::today())
                 ->count();;
 
@@ -64,7 +64,7 @@ class ReceiptNumberController extends Controller
          $validTriggerPoints = range($trigger_point, $limit, $trigger_point);
 
         // Check if the count exceeds the limit
-        if ($count > $limit) {
+        if ($count+1 > $limit) {
             return GlobalFunction::response_function(Message::RECEIPT_NUMBER_LIMIT);
         } else {
             // Check if the current count is a valid trigger point
@@ -100,14 +100,14 @@ class ReceiptNumberController extends Controller
     
             if($isValid){
                 // Send sms when the reciept number is valid
-                // $token = env('SMS_TOKEN');
-                // $sms_post = env('SMS_POST');
+                $token = env('SMS_TOKEN');
+                $sms_post = env('SMS_POST');
     
-                // $response = Http::withToken($token)->post($sms_post, [
-                //             'system_name' => 'Customer Service Satisfaction',
-                //             'message' => 'Fresh Morning! You have been selected to participate in our survey. Your receipt number is ' . $request->receipt_number . '. Please visit the CSS website to complete it.',
-                //             'mobile_number' => $request->receipt_number,
-                // ]);
+                $response = Http::withToken($token)->post($sms_post, [
+                            'system_name' => 'Customer Service Satisfaction',
+                            'message' => 'Fresh Morning! You have been selected to participate in our survey. Your receipt number is ' . $request->receipt_number . '. Please visit the CSS website to complete it.',
+                            'mobile_number' => $request->receipt_number,
+                ]);
             }
            
             return GlobalFunction::response_function(Message::RECEIPT_NUMBER_SAVE);
