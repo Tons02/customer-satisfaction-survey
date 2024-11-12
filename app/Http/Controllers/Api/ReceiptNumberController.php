@@ -89,7 +89,7 @@ class ReceiptNumberController extends Controller
         }
 
         if ($SurveyPeriod->valid_from <= Carbon::today() && Carbon::today() <= $SurveyPeriod->valid_to) {
-           
+
             $create_role = ReceiptNumber::create([
                 "receipt_number" => $request->receipt_number,
                 "contact_details" => $request->contact_details,
@@ -106,7 +106,7 @@ class ReceiptNumberController extends Controller
                 $response = Http::withToken($token)->post($sms_post, [
                             'system_name' => 'Customer Service Satisfaction',
                             'message' => 'Fresh Morning! You have been selected to participate in our survey. Your receipt number is ' . $request->receipt_number . '. Please visit the CSS website to complete it.',
-                            'mobile_number' => $request->receipt_number,
+                            'mobile_number' => $request->contact_details,
                 ]);
             }
            
@@ -115,7 +115,6 @@ class ReceiptNumberController extends Controller
         }
 
         return GlobalFunction::denied(Message::SURVEY_PERIOD_DONE);
-        
          
     }
 
