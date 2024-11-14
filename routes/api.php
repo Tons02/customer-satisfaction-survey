@@ -35,7 +35,7 @@ use App\Http\Controllers\Api\QuestionClassificationController;
 Route::post('login',[AuthController::class,'login']);
 
 //Survey client
-Route::get('survey-answer-get-form-history-id/{id}/{security_code}/{entry_code}',[SurveyAnswerController::class,'getSurveyAnswer']);
+Route::get('survey-answer-get-form-history-id/{id}/{security_code}/{receipt_number}',[SurveyAnswerController::class,'getSurveyAnswer']);
 Route::get('check-survey/{survey_id}/{security_code}',[SurveyAnswerController::class,'checkSurvey']);
 Route::get('register-entry-code-checker/{mobile_number}/{receipt_number}/{store_id}',[SurveyAnswerController::class,'checkEntryCode']);
 

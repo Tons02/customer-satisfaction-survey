@@ -115,7 +115,7 @@ class SurveyAnswerController extends Controller
 
     }
 
-    public function getSurveyAnswer(Request $request, $id, $security_code, $entry_code){
+    public function getSurveyAnswer(Request $request, $id, $security_code, $receipt_number){
 
         $FormHistory = FormHistory::where('survey_id', $id)
         ->where('security_code', $security_code)
@@ -123,7 +123,7 @@ class SurveyAnswerController extends Controller
         
         if (!$FormHistory) {
             $SurveyId = SurveyAnswer::where('id', $id)
-            ->where('entry_code', $entry_code)
+            ->where('receipt_number', $receipt_number)
             ->first();
 
             if (!$SurveyId) {
@@ -154,13 +154,13 @@ class SurveyAnswerController extends Controller
     ->first();
 
     if (!$SurveyPeriod) {
-        return GlobalFunction::response_function(Message::SURVEY_PERIOD_INVALID);
+        return GlobalFunction::invalid(Message::SURVEY_PERIOD_INVALID);
     }
     // return $SurveyPeriod->valid_to;
 
     if ($SurveyPeriod->valid_from <= Carbon::now() && Carbon::now() >= $SurveyPeriod->valid_to ) {
         // i want here that valid_from is less than the day today and the valid_to is less than today it will go thgis
-        return GlobalFunction::response_function(Message::SURVEY_PERIOD_ALREADY_CLOSED);
+        return GlobalFunction::invalid(Message::SURVEY_PERIOD_ALREADY_CLOSED);
     }         
 
     $mobile_number =  $request->mobile_number;
@@ -175,7 +175,7 @@ class SurveyAnswerController extends Controller
     ->first();
 
     if (!$receiptNumberByMobile) {
-    return GlobalFunction::response_function(
+    return GlobalFunction::invalid(
         Message::INVALID_MOBILE_NUMBER
     );
     }
@@ -188,7 +188,7 @@ class SurveyAnswerController extends Controller
     ->first();
 
     if (!$receiptNumberByReceipt) {
-    return GlobalFunction::response_function(
+    return GlobalFunction::invalid(
         Message::INVALID_RECEIPT_NUMBER,
     );
     }
@@ -202,7 +202,7 @@ class SurveyAnswerController extends Controller
     ->first();
 
     if (!$receiptNumberByStore) {
-    return GlobalFunction::response_function(
+    return GlobalFunction::invalid(
         Message::INVALID_STORE,
     );
     }
@@ -241,7 +241,7 @@ class SurveyAnswerController extends Controller
         $FormHistoryId = FormHistory::where('survey_id', $VoucherId->id)->first();
 
         if (!$FormHistoryId) {
-            return GlobalFunction::response_function(Message::NOT_FOUND, $FormHistoryId);
+            return GlobalFunction::invalid(Message::NOT_FOUND, $FormHistoryId);
         }
 
         return GlobalFunction::not_found(
@@ -265,7 +265,7 @@ class SurveyAnswerController extends Controller
         ->first();
 
         if (!$VoucherId) {
-            return GlobalFunction::response_function(Message::NOT_FOUND, $VoucherId);
+            return GlobalFunction::invalid(Message::NOT_FOUND, $VoucherId);
         }  
         
         if ($VoucherId->valid_until <= Carbon::now()) {
@@ -469,10 +469,19 @@ class SurveyAnswerController extends Controller
         if (!$duration) {
             return GlobalFunction::response_function(Message::SURVEY_VALIDITY_INVALID);
         }
+
+        // Check the survey period and duration exceed to set the valid until date
+        if (Carbon::parse($SurveyPeriod->valid_to) <= Carbon::now()->addDays($duration->duration)) {
+            $validUntil = Carbon::parse($SurveyPeriod->valid_to);
+        } else {
+            $validUntil = Carbon::now()->addDays($duration->duration);
+        }
         
-        $validUntil = Carbon::now()->addDays($duration);
+        // Format $validUntil as 'Y-m-d H:i:s' for consistent output
+        $validUntilFormatted = $validUntil->format('Y-m-d H:i:s');
         
-        $voucherCode = substr(str_replace('-', '', Str::uuid()), 0, 4) . $validUntil->format('YmdHis');        
+        // Generate the voucher code with the formatted date
+        $voucherCode = substr(str_replace('-', '', Str::uuid()), 0, 6) . Carbon::now()->format('Ymd'); 
 
         $surveyInterval = SurveyInterval::latest()
         ->first();
