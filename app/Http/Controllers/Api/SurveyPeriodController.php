@@ -9,6 +9,7 @@ use App\Models\SurveyAnswer;
 use App\Models\SurveyPeriod;
 use Illuminate\Http\Request;
 use App\Models\ReceiptNumber;
+use App\Models\VoucherValidity;
 use App\Functions\GlobalFunction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SurveyPeriodRequest;
@@ -75,8 +76,85 @@ class SurveyPeriodController extends Controller
             
             // Finally, delete the surveys themselves
             SurveyAnswer::whereIn('id', $deleted_unanswered_survey)->forceDelete();
-        }
+        }   
+        // if babawasan yung duration update the valid_until voucher
+            if($request['valid_to'] < $survey_period->valid_to){
+                // return 'bawasan';   
+                $duration = VoucherValidity::latest()
+                ->first();
 
+                if (!$duration) {
+                    return GlobalFunction::invalid(Message::SURVEY_VALIDITY_INVALID);
+                }
+                // Retrieve surveys with the specified valid_until and submit_date conditions
+                $update_valid_until_survey = SurveyAnswer::select('id', 'submit_date', 'valid_until')
+               ->withTrashed()
+               ->whereIn('claim', ['not_yet', 'expired'])
+               ->whereBetween('valid_until', [
+                   min($survey_period->valid_to, $request['valid_to']),
+                   max($survey_period->valid_to, $request['valid_to'])
+               ])
+               ->get();
+           
+
+                // Loop through the results to update each valid_until
+                foreach ($update_valid_until_survey as $survey) {
+                    // Convert submit_date to a Carbon instance
+                    $submitDate = Carbon::parse($survey->submit_date);
+
+                    // Determine the new valid_until based on submit_date + duration
+                    $newValidUntil = $submitDate->addDays($duration->duration);
+                    
+                    // Check if the calculated valid_until exceeds the survey period valid_to
+                    if ($newValidUntil > $request['valid_to']) {
+                        // If it exceeds, set valid_until to survey_period valid_to
+                        $survey->valid_until = $request['valid_to'];
+                    } else {
+                        // Otherwise, use the calculated newValidUntil
+                        $survey->valid_until = $newValidUntil;
+                    }
+
+                    // Save the updated survey
+                    $survey->save();
+                }
+            }
+
+            if($request['valid_to'] > $survey_period->valid_to){
+                // return 'extend';
+            $duration = VoucherValidity::latest()
+            ->first();
+
+            if (!$duration) {
+                return GlobalFunction::invalid(Message::SURVEY_VALIDITY_INVALID);
+            }
+
+
+            // Retrieve surveys with the specified valid_until and submit_date conditions
+            $update_valid_until_survey = SurveyAnswer::select('id', 'submit_date', 'valid_until')->withTrashed()
+                ->where('valid_until', '=', $survey_period->valid_to) 
+                ->get();
+
+            // Loop through the results to update each valid_until
+            foreach ($update_valid_until_survey as $survey) {
+                // Convert submit_date to a Carbon instance
+                $submitDate = Carbon::parse($survey->submit_date);
+
+                // Determine the new valid_until based on submit_date + duration
+                $newValidUntil = $submitDate->addDays($duration->duration);
+                
+                // Check if the calculated valid_until exceeds the survey period valid_to
+                if ($newValidUntil > $request['valid_to']) {
+                    // If it exceeds, set valid_until to survey_period valid_to
+                    $survey->valid_until = $request['valid_to'];
+                } else {
+                    // Otherwise, use the calculated newValidUntil
+                    $survey->valid_until = $newValidUntil;
+                }
+
+                // Save the updated survey
+                $survey->save();
+            }
+        }
         //update lang or extend durations
         $survey_period->update([
             "valid_from" => $request['valid_from'],

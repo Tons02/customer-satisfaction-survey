@@ -27,7 +27,7 @@ class SurveyPeriodRequest extends FormRequest
             'date',
         ],
         'valid_to' => [
-            'required',
+            'required', 
             'date',
             'after_or_equal:valid_from', // ensures valid_to is not before valid_from
             'after_or_equal:today', // ensures valid_to is not before today
