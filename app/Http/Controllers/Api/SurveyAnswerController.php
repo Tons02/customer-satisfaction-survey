@@ -156,12 +156,9 @@ class SurveyAnswerController extends Controller
     if (!$SurveyPeriod) {
         return GlobalFunction::invalid(Message::SURVEY_PERIOD_INVALID);
     }
-    // return $SurveyPeriod->valid_to;
 
-    if ($SurveyPeriod->valid_from <= Carbon::now() && Carbon::now() >= $SurveyPeriod->valid_to ) {
-        // i want here that valid_from is less than the day today and the valid_to is less than today it will go thgis
-        return GlobalFunction::invalid(Message::SURVEY_PERIOD_ALREADY_CLOSED);
-    }         
+    // check if your date is valid between 
+    if (Carbon::now()->between($SurveyPeriod->valid_from, $SurveyPeriod->valid_to)) {
 
     $mobile_number =  $request->mobile_number;
     $receipt_number =  $request->receipt_number;
@@ -289,6 +286,10 @@ class SurveyAnswerController extends Controller
                 'status' => 'voucher_available'
             ]
         );
+    }
+    }else {
+        // The current date is outside the survey period
+        return GlobalFunction::invalid(Message::SURVEY_PERIOD_ALREADY_CLOSED);
     }
 
 }

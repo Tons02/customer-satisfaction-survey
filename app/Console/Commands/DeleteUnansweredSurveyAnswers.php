@@ -34,7 +34,7 @@ class DeleteUnansweredSurveyAnswers extends Command
     public function handle()
     {
         // Get today's date
-        $today = Carbon::now()->subDays(90); 
+        $today = Carbon::now()->subDays(10); 
 
 
         $deleted_unanswered_survey = SurveyAnswer::onlyTrashed()
