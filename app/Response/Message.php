@@ -110,6 +110,7 @@ class Message
     const SURVEY_INTERVAL_INVALID = "No Survey Interval has been set. Please contact the administrator.";
     const SURVEY_PERIOD_INVALID = "No Survey Period has been set. Please contact the administrator.";
     const SURVEY_PERIOD_DONE = "The survey period has already ended.";
+    const SURVEY_NEW_PERIOD_INVALID = "The new survey form's valid from date must be equal to or later than today's date.";
 
     //SURVEY_INTERVAL OPERATIONS
     const SURVEY_INTERVAL_SAVE = "Survey interval successfully save.";
