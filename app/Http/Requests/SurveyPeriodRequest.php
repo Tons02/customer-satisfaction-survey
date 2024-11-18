@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SurveyPeriodRequest extends FormRequest
@@ -30,7 +31,14 @@ class SurveyPeriodRequest extends FormRequest
             'required', 
             'date',
             'after_or_equal:valid_from', // ensures valid_to is not before valid_from
-            'after_or_equal:today', // ensures valid_to is not before today
+            function ($attribute, $value, $fail) {
+                $currentTimestamp = now(); // Gets the current timestamp including time
+                $inputTimestamp = Carbon::parse($value); // Parse the input timestamp
+
+                if ($inputTimestamp->lessThan($currentTimestamp)) {
+                    $fail('The :attribute must be after or equal to the current date and time.');
+                }
+            },
         ],
         ];
     } 

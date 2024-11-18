@@ -65,7 +65,7 @@ class ReceiptNumberController extends Controller
 
         // Check if the count exceeds the limit
         if ($count+1 > $limit) {
-            return GlobalFunction::response_function(Message::RECEIPT_NUMBER_LIMIT);
+            return GlobalFunction::invalid(Message::RECEIPT_NUMBER_LIMIT);
         } else {
             // Check if the current count is a valid trigger point
              $isValid = in_array($count+1, $validTriggerPoints);
@@ -80,6 +80,8 @@ class ReceiptNumberController extends Controller
        if (!$SurveyPeriod) {
         return GlobalFunction::not_found(Message::SURVEY_PERIOD_INVALID);
         }   
+
+        if (Carbon::now()->between($SurveyPeriod->valid_from, $SurveyPeriod->valid_to)) {
 
         $expiryDate = Carbon::today()->addDays($SurveyIntervalDay->days);
 
@@ -105,7 +107,7 @@ class ReceiptNumberController extends Controller
     
                 $response = Http::withToken($token)->post($sms_post, [
                             'system_name' => 'Customer Service Satisfaction',
-                            'message' => 'Fresh Morning! You have been selected to participate in our survey. Your receipt number is ' . $request->receipt_number . '. Please visit the CSS website to complete it.',
+                            'message' => 'Fresh Morning! You have been selected to participate in our survey. Your receipt no. is ' . $request->receipt_number . '. Visit the Fresh Options FB page on how to take the survey.',
                             'mobile_number' => $request->contact_details,
                 ]);
             }
@@ -113,6 +115,8 @@ class ReceiptNumberController extends Controller
             return GlobalFunction::response_function(Message::RECEIPT_NUMBER_SAVE);
          
         }
+    }
+        
 
         return GlobalFunction::denied(Message::SURVEY_PERIOD_DONE);
          

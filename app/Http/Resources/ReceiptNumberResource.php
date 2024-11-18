@@ -26,7 +26,8 @@ class ReceiptNumberResource extends JsonResource
             'is_used' => $this->is_used,
             'is_done' => $this->is_done,
             'is_active' => $this->is_active,
-            'created_at' => $this->created_at
+            'created_at' => $this->created_at,
+            'expiration_date' => $this->expiration_date
         ];
     }
 }

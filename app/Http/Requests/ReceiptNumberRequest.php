@@ -52,6 +52,7 @@ class ReceiptNumberRequest extends FormRequest
     {
         return [
             "contact_details.regex" => "The mobile number field format is invalid.",
+            "contact_details.unique" => "User has already been selected.",
         ];
     }
 }

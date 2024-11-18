@@ -482,7 +482,7 @@ class SurveyAnswerController extends Controller
         $validUntilFormatted = $validUntil->format('Y-m-d H:i:s');
         
         // Generate the voucher code with the formatted date
-        $voucherCode = substr(str_replace('-', '', Str::uuid()), 0, 6) . Carbon::now()->format('Ymd'); 
+        $voucherCode = substr(str_replace('-', '', Str::uuid()), 0, 8) . Carbon::now()->format('ymd'); 
 
         $surveyInterval = SurveyInterval::latest()
         ->first();
@@ -679,14 +679,24 @@ class SurveyAnswerController extends Controller
             })
             ->when($data === 'age', function($query) use ($from_date, $to_date, $store) {
                 $query->with('store')
-                    ->select(DB::raw('TIMESTAMPDIFF(YEAR, birthday, CURDATE()) as age'), DB::raw('count(*) as total'))
+                    ->select(
+                        DB::raw('CASE 
+                                    WHEN birthday IS NULL THEN "Unknown"
+                                    WHEN TIMESTAMPDIFF(YEAR, birthday, CURDATE()) BETWEEN 0 AND 14 THEN "Children (0-14)" 
+                                    WHEN TIMESTAMPDIFF(YEAR, birthday, CURDATE()) BETWEEN 15 AND 24 THEN "Youth (15-24)" 
+                                    WHEN TIMESTAMPDIFF(YEAR, birthday, CURDATE()) BETWEEN 25 AND 64 THEN "Adults (25-64)" 
+                                    ELSE "Seniors (65+)"
+                                END as age_group'),
+                        DB::raw('count(*) as total')
+                    )
+                    ->whereNotNull('birthday') // Ensure birthday is not null
                     ->when(!is_null($store), function($query) {
-                        $query->addSelect('store_id')->groupBy('age', 'store_id');
+                        $query->addSelect('store_id')->groupBy('age_group', 'store_id');
                     }, function($query) {
-                        $query->groupBy('age'); // Do not group by store_id when "All store" is selected
+                        $query->groupBy('age_group'); // Do not group by store_id when "All store" is selected
                     })
                     ->whereBetween('submit_date', [$from_date, $to_date]);
-            })  
+            })                        
             ->when($data === 'line-chart', function ($query) use ($startyear, $endyear, $store) {
                 $query->with('store')
                     ->select(
@@ -725,7 +735,7 @@ class SurveyAnswerController extends Controller
                             ];
                         } elseif ($data === 'age') {
                             return [
-                                'age' => $item->age,
+                                'age' => $item->age_group,
                                 'total' => $item->total,
                             ];
                         } elseif ($data === 'line-chart') {
@@ -754,7 +764,7 @@ class SurveyAnswerController extends Controller
                             ];
                         } elseif ($data === 'age') {
                             return [
-                                'age' => $item->age,
+                                'age' => $item->age_group,
                                 'total' => $item->total,
                             ];
                         } elseif ($data === 'line-chart') {

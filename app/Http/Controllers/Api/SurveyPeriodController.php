@@ -121,10 +121,29 @@ class SurveyPeriodController extends Controller
                         // Save the updated survey
                         $survey->save();
                     }
+
+
+                    // Update Receipt expiration date
+                    $update_valid_until_receipt = ReceiptNumber::select('id')
+                    ->withTrashed()
+                    ->where('expiration_date', '=', $survey_period->valid_to) 
+                    ->get();
+
+                    // Loop through the results to update each expiration_date
+                    foreach ($update_valid_until_receipt as $receipt) {
+                    // Convert expiration_date to a Carbon instance (if needed for further calculations)
+                    $expirationDate = Carbon::parse($receipt->expiration_date);
+
+                    // Update the expiration_date with the new valid_to value
+                    $receipt->expiration_date = $request['valid_to'];
+
+                    // Save the updated receipt
+                    $receipt->save();
+                    }
             }
 
             if($request['valid_to'] > $survey_period->valid_to){
-                    // return 'extend';
+                    // return 'new set of survey';
                 $duration = VoucherValidity::latest()
                 ->first();
 
@@ -157,6 +176,7 @@ class SurveyPeriodController extends Controller
 
                     // Save the updated survey
                     $survey->save();
+ 
                 }
             }
 
