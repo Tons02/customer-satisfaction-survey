@@ -94,6 +94,7 @@ class Message
     const STORE_NAME_UPDATE = "Store Name successfully updated.";
     const STORE_NAME_DISPLAY = "Store Name display successfully.";
     const STORE_NAME_ALREADY_USE = "Unable to Archive, Store Name already in used!";
+    const PROVINCE_ID_INVALID = "The selected store linked to an inactive province. Please contact support";
 
     //TRIGGER SET UP OPERATIONS
     const TRIGGER_SAVE = "Trigger Set Up successfully save.";
@@ -111,6 +112,8 @@ class Message
     const SURVEY_PERIOD_INVALID = "No Survey Period has been set. Please contact the administrator.";
     const SURVEY_PERIOD_DONE = "The survey period has already ended.";
     const SURVEY_NEW_PERIOD_INVALID = "The new survey form's valid from date must be equal to or later than today's date.";
+    const STORE_ID_INVALID = "Your account is linked to an closed store. Please contact support";
+    const NO_STORE_ID = "Your account is not linked to any store. Please contact support.";
 
     //SURVEY_INTERVAL OPERATIONS
     const SURVEY_INTERVAL_SAVE = "Survey interval successfully save.";

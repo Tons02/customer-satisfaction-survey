@@ -28,7 +28,6 @@ class SurveyAnswer extends Model
         'questionnaire_answer',
         'voucher_code',
         'valid_until',
-        'next_voucher_date',
         'claim',
         'claim_by_user_id',
         'claimed_date',

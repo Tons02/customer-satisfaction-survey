@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Carbon\Carbon;
 
 class ReceiptNumberRequest extends FormRequest
 {
@@ -41,7 +42,8 @@ class ReceiptNumberRequest extends FormRequest
             "required",
             "regex:/^\+63\d{10}$/",
             Rule::unique('receipt_numbers')->where(function ($query) {
-                return $query->where('is_valid', true); // Only check unique for valid entries
+                $query->where('is_valid', true) // only valid receipt numbers
+                      ->where('expiration_date', '>', Carbon::now()); // Ensure expiration_date is greater than today
             })->ignore($this->route('receipt_number')),
         ]
         ];

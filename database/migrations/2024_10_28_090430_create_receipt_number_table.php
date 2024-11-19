@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedInteger("store_id")->index();
             $table->boolean('is_valid')->default(false);
             $table->boolean('is_used')->default(false);
+            $table->boolean('is_done')->default(false);
             $table->timestamps('expiration_date');
             $table->boolean('is_active')->default(true);
             $table->timestamps();

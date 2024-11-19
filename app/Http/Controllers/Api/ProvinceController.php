@@ -24,6 +24,9 @@ class ProvinceController extends Controller
         when($status === "inactive", function ($query) {
             $query->onlyTrashed();
         })
+        ->when($status === "survey", function ($query) {
+            $query->withTrashed();
+        })
         ->orderBy('created_at', 'desc')
         ->useFilters()
         ->dynamicPaginate();

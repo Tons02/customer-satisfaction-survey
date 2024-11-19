@@ -31,7 +31,6 @@ return new class extends Migration
             $table->json('questionnaire_answer')->nullable();
             $table->string('voucher_code')->nullable();
             $table->timestamp('valid_until')->nullable();
-            $table->timestamp('next_voucher_date')->nullable();
             $table->string('claim')->nullable();
             $table->unsignedInteger("claim_by_user_id")->index()->nullable();
             $table->foreign("claim_by_user_id")

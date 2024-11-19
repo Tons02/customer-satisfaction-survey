@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\StoreName;
+use App\Models\Province;
 use App\Response\Message;
 use Illuminate\Http\Request;
 use App\Functions\GlobalFunction;
@@ -22,6 +23,9 @@ class StoreNameController extends Controller
         $StoreName = StoreName::
         when($status === "inactive", function ($query) {
             $query->onlyTrashed();
+        })
+        ->when($status === "survey", function ($query) {
+            $query->withTrashed();
         })
         ->orderBy('created_at', 'desc')
         ->useFilters()
@@ -85,6 +89,11 @@ class StoreNameController extends Controller
         }
         
         if ($store_name->deleted_at) {
+
+            if (Province::withTrashed()->where('id', $store_name->province_id)->whereNotNull('deleted_at')->exists()) {
+                return GlobalFunction::invalid(Message::PROVINCE_ID_INVALID );
+            }
+
             $store_name->update([
                 'is_active' => 1
             ]);

@@ -28,7 +28,6 @@ class SurveyAnswerFilter extends QueryFilters
         "birthday",
         "voucher_code",
         "valid_until",
-        "next_voucher_date",
     ];
 
     

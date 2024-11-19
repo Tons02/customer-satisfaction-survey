@@ -15,6 +15,7 @@ use Essa\APIToolKit\Api\ApiResponse;
 use Illuminate\Support\Facades\Http;
 use App\Http\Requests\ReceiptNumberRequest;
 use App\Http\Resources\ReceiptNumberResource;
+use App\Models\StoreName;
 
 class ReceiptNumberController extends Controller
 {
@@ -45,6 +46,14 @@ class ReceiptNumberController extends Controller
     public function store(ReceiptNumberRequest $request)
     {      
         $storeId = auth('sanctum')->user()->store_id;
+        
+        if (StoreName::withTrashed()->where('id', $storeId)->whereNotNull('deleted_at')->exists()) {
+            return GlobalFunction::invalid(Message::STORE_ID_INVALID);
+        }
+
+        if(is_null($storeId)){
+            return GlobalFunction::invalid(Message::NO_STORE_ID);
+        }
 
         // Count the total receipt numbers for the given store_id per day
         $count = ReceiptNumber::withTrashed()->where('store_id', $storeId)

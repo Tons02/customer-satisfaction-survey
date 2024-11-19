@@ -74,6 +74,8 @@ class UserController extends Controller
             "password" => $request["username"],
 
             "role_id" => $request["role_id"],
+            
+            "user_type" => $request["user_type"],
 
         ]);
 
@@ -117,6 +119,8 @@ class UserController extends Controller
         
         $userID->province_id = $request["personal_info"]["province_id"];
         $userID->store_id = $request["personal_info"]["store_id"];
+
+        $userID->user_type = $request["user_type"];
 
         if (!$userID->isDirty()) {
             return GlobalFunction::response_function(Message::NO_CHANGES);

@@ -167,26 +167,12 @@ class SurveyAnswerController extends Controller
     // Check if the mobile number exists
     $receiptNumberByMobile = ReceiptNumber::where('contact_details', $mobile_number)
     ->where('is_valid', 1)
-    ->where('is_valid', 1)
     ->latest()
     ->first();
 
     if (!$receiptNumberByMobile) {
     return GlobalFunction::invalid(
         Message::INVALID_MOBILE_NUMBER
-    );
-    }
-
-    // Check if the receipt number exists for the provided mobile number
-    $receiptNumberByReceipt = ReceiptNumber::where('contact_details', $mobile_number)
-    ->where('receipt_number', $receipt_number)
-    ->where('is_valid', 1)
-    ->latest()
-    ->first();
-
-    if (!$receiptNumberByReceipt) {
-    return GlobalFunction::invalid(
-        Message::INVALID_RECEIPT_NUMBER,
     );
     }
 
@@ -267,7 +253,7 @@ class SurveyAnswerController extends Controller
         
         if ($VoucherId->valid_until <= Carbon::now()) {
             return GlobalFunction::invalid(
-                "You have already used your available voucher. Your next available one is on " . $VoucherId->next_voucher_date,
+                "You have already used your voucher. Your next available one is on " . $VoucherId->next_voucher_date,
                 [
                     'voucher_code' => $VoucherId->voucher_code,
                     'valid_until' => $VoucherId->valid_until,
@@ -482,14 +468,8 @@ class SurveyAnswerController extends Controller
         $validUntilFormatted = $validUntil->format('Y-m-d H:i:s');
         
         // Generate the voucher code with the formatted date
-        $voucherCode = substr(str_replace('-', '', Str::uuid()), 0, 8) . Carbon::now()->format('ymd'); 
+        $voucherCode = substr(str_replace('-', '', Str::uuid()), 0, 8) . Carbon::now()->format('Ymd'); 
 
-        $surveyInterval = SurveyInterval::latest()
-        ->first();
-
-        if (!$surveyInterval) {
-            return GlobalFunction::response_function(Message::SURVEY_INTERVAL_INVALID);
-        }
 
         $SurveyAnswerId->restore();
 
@@ -497,7 +477,6 @@ class SurveyAnswerController extends Controller
             "questionnaire_answer" => $request->input('questionnaire_answer'),
             "voucher_code" => $voucherCode,
             "valid_until" => $validUntil,
-            "next_voucher_date" => Carbon::now()->addDays($surveyInterval->days),
             "claim" => "not_yet",
             "is_active" => 1,
             "submit_date" => Carbon::now(),
