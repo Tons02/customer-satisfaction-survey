@@ -41,9 +41,8 @@ class UserRequest extends FormRequest
             // "personal_info.sub_unit" => "required",
             // "personal_info.location" => "required",
             // "personal_info.province_id" =>  ["required","exists:provinces,id"],
-            // "personal_info.store_id" =>  ["required","exists:store_names,id"],
-
-            "username" => [
+            "personal_info.store_id" =>  ["nullable","exists:store_names,id", "unique:users,store_id," . $this->route()->user,],
+            "username" => [ 
                 "required",
                 "unique:users,username," . $this->route()->user,
             ],
@@ -66,7 +65,7 @@ class UserRequest extends FormRequest
             // "personal_info.sub_unit.required" => "The sub_unit field is required.",
             // "personal_info.location.required" => "The location field is required.",
             // "personal_info.province_id.required" => "The province field is required.",
-            // "personal_info.store_id.required" => "The store field is required.",
+            "personal_info.store_id.unique" => "The store already used",
             // "personal_info.province_id.exists" => "The selected province is invalid.",
             // "personal_info.store_id.exists" => "The selected store is invalid.",
         ];

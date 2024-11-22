@@ -24,7 +24,7 @@ class StoreNameController extends Controller
         when($status === "inactive", function ($query) {
             $query->onlyTrashed();
         })
-        ->when($status === "survey", function ($query) {
+        ->when($status === "filter", function ($query) {
             $query->withTrashed();
         })
         ->orderBy('created_at', 'desc')

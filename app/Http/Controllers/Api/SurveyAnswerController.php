@@ -176,6 +176,19 @@ class SurveyAnswerController extends Controller
     );
     }
 
+    // Check if the receipt number connected to number is true
+    $receiptNumberandReceipt = ReceiptNumber::where('contact_details', $mobile_number)
+    ->where('receipt_number', $receipt_number)
+    ->where('is_valid', 1)
+    ->latest()
+    ->first();
+
+    if (!$receiptNumberandReceipt) {
+    return GlobalFunction::invalid(
+        Message::INVALID_RECEIPT_NUMBER,
+    );
+    }
+
     // Check if the store ID exists for the provided mobile number and receipt number
     $receiptNumberByStore = ReceiptNumber::where('contact_details', $mobile_number)
     ->where('receipt_number', $receipt_number)
@@ -189,6 +202,7 @@ class SurveyAnswerController extends Controller
         Message::INVALID_STORE,
     );
     }
+    
 
     // check if the valid receipt number is expired before throwing available
     if ($receiptNumberByStore->expiration_date <= Carbon::now()) {
@@ -468,7 +482,7 @@ class SurveyAnswerController extends Controller
         $validUntilFormatted = $validUntil->format('Y-m-d H:i:s');
         
         // Generate the voucher code with the formatted date
-        $voucherCode = substr(str_replace('-', '', Str::uuid()), 0, 8) . Carbon::now()->format('Ymd'); 
+        $voucherCode = substr(str_replace('-', '', Str::uuid()), 0, 5) . Carbon::now()->format('Ymdhis'); 
 
 
         $SurveyAnswerId->restore();

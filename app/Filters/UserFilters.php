@@ -36,4 +36,14 @@ class UserFilters extends QueryFilters
         "username",
         "created_at", 
     ];
+
+
+    public function user_type($user_type)
+    {
+        if ($user_type !== null) {
+            $this->builder->where('user_type', $user_type);
+        }
+    
+        return $this; // Returning $this to allow method chaining
+    }
 }
