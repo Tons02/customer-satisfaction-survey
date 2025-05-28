@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class SurveyAnswer extends Model
 {
     use HasFactory, softDeletes, Filterable;
-    
-    protected $fillable = [ 
+
+    protected $fillable = [
         'receipt_number',
         'store_id',
         'first_name',
@@ -36,7 +36,7 @@ class SurveyAnswer extends Model
     ];
 
     protected $hidden = [
-        // "updated_at", 
+        // "updated_at",
         "deleted_at"
     ];
 
@@ -57,5 +57,5 @@ class SurveyAnswer extends Model
     {
         return $this->belongsTo(StoreName::class, 'store_id')->withTrashed();
     }
-    
+
 }

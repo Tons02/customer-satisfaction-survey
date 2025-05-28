@@ -61,9 +61,10 @@ class SurveyAnswerRequest extends FormRequest
                 'in:male,female',
             ],
             "birthday" => [
-                "sometimes:required",
-                'required',
-                'date_format:Y-m-d',
+                "sometimes",
+                "required",
+                "date_format:Y-m-d",
+                "before_or_equal:" . now()->subYears(18)->format('Y-m-d'),
             ],
             "claim_by_user_id" => [
                 "sometimes:required",

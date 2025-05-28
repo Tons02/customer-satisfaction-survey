@@ -33,12 +33,12 @@ class ReceiptNumberRequest extends FormRequest
                     : "unique:receipt_numbers,receipt_number,NULL,id,store_id," . auth('sanctum')->user()->store_id,
             ],
         // validation for all number
-        //    "contact_details" => [ 
+        //    "contact_details" => [
         //     "required",
         //     "regex:/^\+63\d{10}$/",
         //     "unique:receipt_numbers,contact_details," . $this->route('receipt_number'), // Adjust to match route parameter name
         // ],
-           "contact_details" => [ 
+           "contact_details" => [
             "required",
             "regex:/^\+63\d{10}$/",
             Rule::unique('receipt_numbers')->where(function ($query) {
@@ -47,7 +47,7 @@ class ReceiptNumberRequest extends FormRequest
             })->ignore($this->route('receipt_number')),
         ]
         ];
-        
+
     }
 
     public function messages()

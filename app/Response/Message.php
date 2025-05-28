@@ -17,13 +17,13 @@ class Message
     const RESET_PASSWORD = "The Password has been reset";
     const CHANGE_PASSWORD = "Password change successfully";
     const LOGOUT_USER = "You are successfully logged out.";
-    
+
 
     //USER OPERATIONS
     const USER_SAVE = "User successfully save.";
     const USER_UPDATE = "User successfully updated.";
     const USER_DISPLAY = "User display successfully.";
-    
+
     //ROLE OPERATIONS
     const ROLE_SAVE = "Role successfully save.";
     const ROLE_UPDATE = "Role successfully updated.";
@@ -139,7 +139,7 @@ class Message
     const INVALID_ACTION = "Invalid action.";
     const ARCHIVE_STATUS = "Successfully archived.";
     const RESTORE_STATUS = "Successfully restore.";
-    
+
 }
 
 ?>

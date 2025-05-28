@@ -46,4 +46,3 @@ class SurveyAnswerResource extends JsonResource
         ];
     }
 }
-    

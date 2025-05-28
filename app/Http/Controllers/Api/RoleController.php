@@ -15,12 +15,12 @@ use Essa\APIToolKit\Api\ApiResponse;
 class RoleController extends Controller
 {
     use ApiResponse;
-    
+
     public function index(Request $request)
-    {   
+    {
 
         $status = $request->query('status');
-        
+
         $Role = Role::
         when($status === "inactive", function ($query) {
             $query->onlyTrashed();
@@ -28,7 +28,7 @@ class RoleController extends Controller
         ->orderBy('created_at', 'desc')
         ->useFilters()
         ->dynamicPaginate();
-        
+
         $is_empty = $Role->isEmpty();
 
         if ($is_empty) {
@@ -41,18 +41,17 @@ class RoleController extends Controller
 
     public function store(RoleRequest $request)
     {
-
         $create_role = Role::create([
             "name" => $request->name,
             "access_permission" => $request->access_permission,
         ]);
 
         return GlobalFunction::response_function(Message::ROLE_SAVE);
-        
+
     }
 
     public function update(RoleRequest $request, $id)
-    {   
+    {
         $role_id = Role::find($id);
 
         if (!$role_id) {
@@ -68,7 +67,7 @@ class RoleController extends Controller
         }
 
         $role_id->save();
-        
+
         return GlobalFunction::response_function(Message::ROLE_UPDATE);
     }
 
@@ -79,7 +78,7 @@ class RoleController extends Controller
         if (!$role) {
             return GlobalFunction::not_found(Message::NOT_FOUND);
         }
-        
+
         if ($role->deleted_at) {
             $this->authorize('restore', $role);
 
@@ -103,6 +102,6 @@ class RoleController extends Controller
             $role->delete();
             return GlobalFunction::response_function(Message::ARCHIVE_STATUS);
 
-        } 
+        }
     }
 }

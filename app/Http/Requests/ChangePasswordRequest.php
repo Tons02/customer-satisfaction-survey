@@ -39,5 +39,4 @@ class ChangePasswordRequest extends FormRequest
             "new_password.not_in" => "The new password and username must be different",
         ];
     }
-    
 }

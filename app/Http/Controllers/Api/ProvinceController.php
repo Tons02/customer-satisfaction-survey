@@ -15,11 +15,11 @@ use App\Http\Resources\ProvinceResource;
 class ProvinceController extends Controller
 {
     use ApiResponse;
-    
+
     public function getAllProvinceNames(Request $request)
-    {   
+    {
         $status = $request->query('status');
-        
+
         $Province = Province::
         when($status === "inactive", function ($query) {
             $query->onlyTrashed();
@@ -30,15 +30,15 @@ class ProvinceController extends Controller
         ->orderBy('created_at', 'desc')
         ->useFilters()
         ->dynamicPaginate();
-        
+
         $is_empty = $Province->isEmpty();
 
         if ($is_empty) {
             return GlobalFunction::response_function(Message::NOT_FOUND);
         }
         ProvinceResource::collection($Province);
-        $ResultProvince = $request->query('pagination') == 'none' 
-        ? ['data' => ProvinceResource::collection($Province)] 
+        $ResultProvince = $request->query('pagination') == 'none'
+        ? ['data' => ProvinceResource::collection($Province)]
         : $Province;
 
         return GlobalFunction::response_function(Message::PROVINCE_DISPLAY,$ResultProvince);
@@ -47,7 +47,7 @@ class ProvinceController extends Controller
 
     public function store(ProvinceRequest $request)
     {
-        
+
         $this->authorize('create', Province::class);
 
         $create_province = Province::create([
@@ -55,11 +55,11 @@ class ProvinceController extends Controller
         ]);
 
         return GlobalFunction::response_function(Message::PROVINCE_SAVE);
-        
+
     }
 
     public function update(ProvinceRequest $request, $id)
-    {   
+    {
         $province_id = Province::find($id);
 
         if (!$province_id) {
@@ -75,7 +75,7 @@ class ProvinceController extends Controller
         }
 
         $province_id->save();
-        
+
         return GlobalFunction::response_function(Message::PROVINCE_UPDATE);
     }
 
@@ -86,7 +86,7 @@ class ProvinceController extends Controller
         if (!$province) {
             return GlobalFunction::not_found(Message::NOT_FOUND);
         }
-        
+
         if ($province->deleted_at) {
 
             $this->authorize('restore', $province);
@@ -94,7 +94,7 @@ class ProvinceController extends Controller
             $province->update([
                 'is_active' => 1
             ]);
-            
+
             $province->restore();
             return GlobalFunction::response_function(Message::RESTORE_STATUS);
         }
@@ -113,6 +113,6 @@ class ProvinceController extends Controller
             $province->delete();
             return GlobalFunction::response_function(Message::ARCHIVE_STATUS);
 
-        } 
+        }
     }
 }
