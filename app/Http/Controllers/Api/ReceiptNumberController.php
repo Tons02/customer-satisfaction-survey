@@ -102,7 +102,7 @@ class ReceiptNumberController extends Controller
 
             if ($today->between(Carbon::parse($SurveyPeriod->valid_from), Carbon::parse($SurveyPeriod->valid_to))) {
 
-                $create_role = ReceiptNumber::create([
+                $create_receipt = ReceiptNumber::create([
                     "receipt_number" => $request->receipt_number,
                     "contact_details" => $request->contact_details,
                     "store_id" => auth('sanctum')->user()->store_id,
@@ -117,7 +117,7 @@ class ReceiptNumberController extends Controller
 
                     $response = Http::withToken($token)->post($sms_post, [
                         'system_name' => 'Customer Service Satisfaction',
-                        'message' => 'Fresh Morning! You have been selected to participate in our survey. Your receipt no. is ' . $request->receipt_number . '. Visit the Fresh Options FB page on how to take the survey.',
+                        'message' => 'Fresh Morning! You have been selected to participate in our survey. Your receipt no. is ' . $request->receipt_number . '. Visit the Fresh Options Website.',
                         'mobile_number' => $request->contact_details,
                     ]);
                 }
